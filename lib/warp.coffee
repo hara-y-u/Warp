@@ -18,14 +18,16 @@ CLIENT_HTML = '''
       header { height:1.2em; overflow:hidden; border-bottom:solid 1px #bbb; }
       body { height:100%; width:100%; }
       iframe#warp-frame { height:100%; width:100%; border:0; }
+      #closed-screen { display:none; height:100%; width:100%; position:absolute; left:0; top:1.2em; background-color:rgba(0,0,0,0.4); z-index: 99999;}
     </style>
     <script src="/client.js"></script>
   </head>
   <body>
+    <div id="closed-screen"></div>
     <header>
       Warp Client
     </header>
-    <iframe id=\"warp-frame\" src="/content.html"/>
+    <iframe id="warp-frame" src="/content.html"/>
   </body>
 </html>
 '''
@@ -73,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() { startupStack.pop()();
 startupStack.pop()();
 
 soc.onclose = function() {
-  soc.send(JSON.stringify({ type:'status', data:'stop' }));
+  document.getElementById('closed-screen').setAttribute('style', 'display:block;');
 };
 
 }());
