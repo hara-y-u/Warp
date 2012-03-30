@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+require('coffee-script')
+
+var Warp = require('lib/warp')
+, warp = new Warp;
+
+warp.startServer()
