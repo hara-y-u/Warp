@@ -38,7 +38,7 @@
 ;;; Commands:
 
 ;;; TODO
-;;  2012-03-31 Dont show precess output (?) on buffer
+;;  2012-03-31 Dont show process output (?) on buffer
 
 ;;; Code:
 
@@ -85,22 +85,26 @@
   :type 'list
   :group 'warp)
 
+(defvar warp-mode-hook nil
+  "Hook for warp mode")
+
 (define-minor-mode warp-mode
   "Web Application Realtime Preview minor mode"
   :lighter " Warp"
   :group  'warp
   (if warp-mode
-      (progn (warp-start-server)
+      (progn (warp-start-server-process)
              (if warp-auto-open-client
                  (progn (sleep-for 3)
                         (warp-open-client)))
              (if warp-html-auto-start-sending
-                 (warp-html-start-sending)))
+                 (warp-html-start-sending))
+             (run-hooks 'warp-mode-hook))
     (warp-interrupt-server)))
 
 
 ;; User Command
-(defun warp-start-server ()
+(defun warp-start-server-process ()
   "Start warp server for current buffer"
   (interactive)
   (progn (set (make-local-variable 'warp-server-port)
@@ -163,7 +167,7 @@
 (defvar warp-current-server-port
   warp-server-port-base
   "Current port number for server.
-Be sure to get port number through warp-get-server-port.")
+Be sure to get port number by warp-get-server-port.")
 
 (defun warp-get-server-port ()
   "Get next port number for server."
