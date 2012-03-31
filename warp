@@ -17,6 +17,7 @@ process.argv.forEach(function(val, idx) {
 var Warp = require(__dirname + '/lib/warp')
 , warp = new Warp({
     port: opts.p || opts.port || 8800
+    , autoCloseClients: opts.hasOwnProperty("c")
   });
 
 warp.startServer()

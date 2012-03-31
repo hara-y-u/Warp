@@ -7,8 +7,21 @@ messageParser = /([\w\d]+):(.+)/
 
 PORT = 8898
 
-# Static
-CLIENT_HTML = '''
+module.exports = class Warp
+  constructor: (options = {}) ->
+    @autoCloseClients = options.autoCloseClients
+    @port   = options.port   or PORT
+    @stdin  = process.stdin
+    @stdout = process.stdout
+    @stderr = process.stderr
+    @sockets = {}
+    @socketId = 0
+    process.on 'SIGINT', @onSigint
+    process.on 'uncaughtException', (err) =>
+      @stderr.write "error:uncaught_exception #{err}\n"
+
+  # Static
+  clientHtml: () => '''
 <!DOCTYPE html>
 <html>
   <head>
@@ -35,7 +48,7 @@ CLIENT_HTML = '''
 </html>
 '''
 
-CLIENT_JS = """
+  clientJs: () => """
 (function () {
 
 var soc = new WebSocket('ws://' + location.host + '/', 'warp')
@@ -81,30 +94,19 @@ document.addEventListener('DOMContentLoaded', function() { startupStack.pop()();
 startupStack.pop()();
 
 soc.onclose = function() {
+  if(#{@autoCloseClients}) { window.open('', '_self', ''); window.close(); }
   document.getElementById('closed-screen').setAttribute('style', 'display:block;');
 };
 
 }());
 """
 
-CONTENT_HTML = '''
+  contentHtml: () => '''
 <html>
   <body>
   </body>
 </html>
 '''
-
-module.exports = class Warp
-  constructor: (options = {}) ->
-    @port   = options.port   or PORT
-    @stdin  = process.stdin
-    @stdout = process.stdout
-    @stderr = process.stderr
-    @sockets = {}
-    @socketId = 0
-    process.on 'SIGINT', @onSigint
-    process.on 'uncaughtException', (err) =>
-      @stderr.write "error:uncaught_exception #{err}\n"
 
   onSigint: () =>
     @httpServer.close() if @httpServer
@@ -124,13 +126,13 @@ module.exports = class Warp
     switch url.parse(req.url).path
       when '/'
         res.writeHead 200, 'Content-Type': 'text/html'
-        res.write CLIENT_HTML, 'utf-8'
+        res.write @clientHtml(), 'utf-8'
       when '/content.html'
         res.writeHead 200, 'Content-Type': 'text/html'
-        res.write CONTENT_HTML, 'utf-8'
+        res.write @contentHtml(), 'utf-8'
       when '/client.js'
         res.writeHead 200, 'Content-Type': 'text/javascript'
-        res.write CLIENT_JS, 'utf-8'
+        res.write @clientJs(), 'utf-8'
       else
         res.writeHead 404, 'Content-Type': 'text/plain'
         res.write '404 Not Found\n'
