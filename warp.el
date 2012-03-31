@@ -56,21 +56,21 @@
   :group 'warp)
 
 (defcustom warp-auto-open-client t
-  "Open client in browser when warp-mode turned on"
+  "Open client in browser when warp-mode is turned on"
   :type 'boolean
   :group 'warp)
 
 (defcustom warp-auto-close-client t
-  "Close client when warp-mode turned off"
+  "Close client when warp-mode is turned off"
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-html-auto-start-sending nil
-  "Start sending html to the server when mode has turned on"
+(defcustom warp-html-auto-start-sending t
+  "Start sending html to the server when mode is turned on"
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-idle-time 0.3
+(defcustom warp-idle-time 0.5
   "Time for idle detection on html sending mode"
   :type 'float
   :group 'warp)
