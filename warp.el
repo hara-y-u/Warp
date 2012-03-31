@@ -106,7 +106,7 @@
   (progn (set (make-local-variable 'warp-server-port)
               (warp-get-server-port))
          (set (make-local-variable 'warp-server-process)
-              (apply 'warp-start-server-internal (current-buffer)
+              (apply 'warp-start-server-process-internal (current-buffer)
                      "-p" (number-to-string warp-server-port)
                      (append warp-server-command-args
                              (if warp-auto-close-client '("-c") nil))))))
@@ -169,18 +169,25 @@ Be sure to get port number through warp-get-server-port.")
   "Get next port number for server."
   (setq warp-current-server-port (1+ warp-current-server-port)))
 
-(defun warp-receive-server-output (process output)
+(defun warp-server-process-filter (process output)
   "Receive warp server outputs"
   (message "Warp: %s" (replace-regexp-in-string "\n+$" "" output)))
 
-(defun warp-start-server-internal (buffer &rest args)
+(defun warp-server-process-sentinel (process event)
+  "Sentinel for warp server process.
+Now, just for preventing output to be appended to buffer."
+  nil)
+
+(defun warp-start-server-process-internal (buffer &rest args)
   "Start warp server and returns server process.
 This function takes buffer to which bind server process to.
 Pass nil as buffer if you wish no buffer to be bound."
   (let ((process
          (apply 'start-process "warp-server" buffer
                 (expand-file-name warp-server-command warp-server-command-path) args)))
-    (set-process-filter process 'warp-receive-server-output) process))
+    (set-process-query-on-exit-flag process nil)
+    (set-process-sentinel process 'warp-server-process-sentinel)
+    (set-process-filter process 'warp-server-process-filter) process))
 
 
 ;; Provide
