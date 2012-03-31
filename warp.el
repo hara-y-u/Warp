@@ -150,7 +150,7 @@ Be sure to get port number through warp-get-server-port.")
 
 (defun warp-receive-server-output (process output)
   "Receive warp server outputs"
-  (message "Warp: %s" output))
+  (message "Warp: %s" (replace-regexp-in-string "\n+$" "" output)))
 
 (defun warp-start-server-internal (buffer &rest args)
   "Start warp server and returns server process.
