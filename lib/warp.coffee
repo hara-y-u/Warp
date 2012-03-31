@@ -3,7 +3,6 @@
 http = require 'http'
 url = require 'url'
 WebSocketServer = new require('websocket').server
-messageParser = /([\w\d]+):(.+)/
 
 PORT = 8898
 
@@ -16,9 +15,12 @@ module.exports = class Warp
     @stderr = process.stderr
     @sockets = {}
     @socketId = 0
+    @mode = null
+    @buf =
+      html: []
     process.on 'SIGINT', @onSigint
-    process.on 'uncaughtException', (err) =>
-      @stderr.write "error:uncaught_exception #{err}\n"
+    # process.on 'uncaughtException', (err) =>
+    #   @stderr.write "error:uncaught_exception #{err}\n"
 
   # Static
   clientHtml: () => '''
@@ -28,7 +30,7 @@ module.exports = class Warp
     <title>Warp</title>
     <style>
       * { margin:0; padding:0 }
-      header { height:1.2em; overflow:hidden; border-bottom:solid 1px #bbb; }
+      header { display:none; height:1.2em; overflow:hidden; border-bottom:solid 1px #bbb; }
       body { height:100%; width:100%; }
       iframe#warp-frame { height:100%; width:100%; border:0; }
       #closed-screen { display:none; height:100%; width:100%;
@@ -63,6 +65,7 @@ startupStack.push(function() {
 
   soc.onmessage = function(msg) {
     msg = JSON.parse(msg.data);
+    console.log(msg.type, msg.data);
     switch (msg.type) {
       // case 'reload':
       //   frame.contentWindow.location.reload();
@@ -72,8 +75,9 @@ startupStack.push(function() {
         frame.contentWindow.location.href = msg.data;
         break;
       case 'html':
-        frame.contentDocument.documentElement.innerHTML = msg.data
-          .replace(/<!doctype[^>]*>/i, '').replace(/<\\/?html[^>]*>/i, '');
+        frame.contentDocument.documentElement.innerHTML = msg.data;
+        document.title = frame.contentDocument.title
+          //.replace(/<!doctype[^>]*>/i, '').replace(/<\\/?html[^>]*>/i, '');
         break;
       case 'client_id':
         document.getElementById('client-id').innerText = msg.data;
@@ -120,7 +124,7 @@ soc.onclose = function() {
   startHttpServer: () =>
     @httpServer = http.createServer @handleHttpRequest
     @httpServer.listen @port
-    @stdout.write "start:lotalhost:#{@port}\n"
+    console.log "start:lotalhost:#{@port}"
 
   handleHttpRequest: (req, res) =>
     switch url.parse(req.url).path
@@ -163,10 +167,10 @@ soc.onclose = function() {
 
       webSocket.on 'close', () =>
         delete @sockets[id]
-        process.stdout.write "client_#{id}_status:closed\n"
+        console.log "client_#{id}_status:closed"
 
   handleWebSocketMessage: (msg, id) =>
-    process.stdout.write "client_#{id}_#{msg.type}:#{msg.data}\n"
+    console.log "client_#{id}_#{msg.type}:#{msg.data}"
 
   sendWebSocketMessage: (msg, id) =>
     if id
@@ -181,12 +185,19 @@ soc.onclose = function() {
     @stdin.setEncoding 'utf8'
     @stdin.on 'data', @handleStdin
     @stdin.on 'end', () ->
-      @stdout.write 'status:stdin_end\n'
+      console.log 'status:stdin end'
 
   handleStdin: (chunk) =>
-    msg = messageParser.exec chunk
-    if !msg or !msg[1] or !msg[2]
-      @stderr.write 'error:parse_error\n'
-      return
+    switch chunk
+      when "__html__\n"
+        @mode = 'html'
+        console.log 'status:html mode'
+        return
+      when "__endhtml__\n"
+        @mode = null
+        console.log 'status:leave html mode'
+        @sendWebSocketMessage type: 'html', data: @buf.html.join('')
+        @buf.html = []
+        return
 
-    @sendWebSocketMessage type: msg[1], data: msg[2]
+    @buf.html.push(chunk) if @mode is 'html' and /\S+/.test(chunk)

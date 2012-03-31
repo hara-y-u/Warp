@@ -46,7 +46,7 @@
 
 ;; Customize
 (defgroup warp nil
-  "Web Application Realtime Preview mode"
+  "Warp mode"
   :group 'convenience
   :prefix "warp-")
 
@@ -62,6 +62,11 @@
 
 (defcustom warp-auto-close-client t
   "Close client when warp-mode turned off"
+  :type 'boolean
+  :group 'warp)
+
+(defcustom warp-html-auto-start-sending nil
+  "Start sending html to the server when mode has turned on"
   :type 'boolean
   :group 'warp)
 
@@ -89,8 +94,8 @@
              (if warp-auto-open-client
                  (progn (sleep-for 3)
                         (warp-open-client)))
-             (run-with-idle-timer warp-idle-time t
-                                  'warp-html-send-current-buffer))
+             (if warp-html-auto-start-sending
+                 (warp-html-start-sending)))
     (warp-interrupt-server)))
 
 
@@ -121,17 +126,33 @@
 (defun warp-html-command (string)
   "Send string as html command data to warp server's STDIN"
   (interactive "sHTML string send to warp: ")
-  (warp-send-server-string (concat "html:" string "\n")))
+  (warp-send-server-string (concat "__html__\n" string "\n__endhtml__\n")))
 
 (defun warp-html-send-current-buffer ()
   "Send warp server current buffer content as HTML data"
   (interactive)
-  (warp-html-command (replace-regexp-in-string "\n" "" (buffer-string))))
+  (warp-html-command
+   (replace-regexp-in-string "[\n]" ""
+                             (encode-coding-string (buffer-string) 'utf-8))))
+
+(defun warp-html-start-sending ()
+  "Start sending html to the server"
+  (interactive)
+  (set (make-local-variable 'warp-sending-timer)
+       (run-with-idle-timer warp-idle-time t
+                       'warp-html-send-current-buffer)))
+
+(defun warp-html-stop-sending ()
+  "Stop sending html to the server"
+  (interactive)
+  (if (timerp warp-sending-timer)
+      (cancel-timer warp-sending-timer)))
 
 (defun warp-open-client ()
   "Open warp client within default browser"
   (interactive)
   (browse-url (concat "http://localhost:" (number-to-string warp-server-port) "/")))
+
 
 
 ;; Fundamental
