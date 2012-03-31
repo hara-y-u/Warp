@@ -3,7 +3,7 @@
 http = require 'http'
 url = require 'url'
 WebSocketServer = new require('websocket').server
-messageParser = /(\w+):(.+)/
+messageParser = /([\w\d]+):(.+)/
 
 PORT = 8898
 
@@ -18,14 +18,17 @@ CLIENT_HTML = '''
       header { height:1.2em; overflow:hidden; border-bottom:solid 1px #bbb; }
       body { height:100%; width:100%; }
       iframe#warp-frame { height:100%; width:100%; border:0; }
-      #closed-screen { display:none; height:100%; width:100%; position:absolute; left:0; top:1.2em; background-color:rgba(0,0,0,0.4); z-index: 99999;}
+      #closed-screen { display:none; height:100%; width:100%;
+                       text-align: center; font-size: 3em;
+                       position:absolute; left:0; top:1.2em;
+                       background-color:rgba(0,0,0,0.4); z-index: 99999;}
     </style>
     <script src="/client.js"></script>
   </head>
   <body>
-    <div id="closed-screen"></div>
+    <div id="closed-screen">It seems server has stopped :(</div>
     <header>
-      Warp Client
+      Warp Client #<span id="client-id"/>
     </header>
     <iframe id="warp-frame" src="/content.html"/>
   </body>
@@ -58,6 +61,9 @@ startupStack.push(function() {
       case 'html':
         frame.contentDocument.documentElement.innerHTML = msg.data
           .replace(/<!doctype[^>]*>/i, '').replace(/<\\/?html[^>]*>/i, '');
+        break;
+      case 'client_id':
+        document.getElementById('client-id').innerText = msg.data;
         break;
       default:
         soc.send(JSON.stringify({ type:'error', data:'unknown_type' }));
@@ -94,6 +100,15 @@ module.exports = class Warp
     @stdin  = process.stdin
     @stdout = process.stdout
     @stderr = process.stderr
+    @sockets = {}
+    @socketId = 0
+    process.on 'SIGINT', @onSigint
+    process.on 'uncaughtException', (err) =>
+      @stderr.write "error:uncaught_exception #{err}\n"
+
+  onSigint: () =>
+    @httpServer.close() if @httpServer
+    process.exit()
 
   startServer: () =>
     @startHttpServer()
@@ -122,24 +137,44 @@ module.exports = class Warp
 
     res.end()
 
+  # WebSocket
   startWebSocketServer: () =>
-    # WebSocket
     @webSocketServer = new WebSocketServer
       httpServer: @httpServer
 
     @webSocketServer.on 'request', (req) =>
-      @webSocket = req.accept 'warp', req.origin
+      webSocket = req.accept 'warp', req.origin
+
+      # Make internal reference for client id
+      id = @socketId++
+
+      webSocket.send JSON.stringify
+        type: 'client_id'
+        data: id
+
+      @sockets[id] = webSocket
 
       #From Client
-      @webSocket.on 'message', (msg) =>
+      webSocket.on 'message', (msg) =>
         msg = JSON.parse(msg.utf8Data);
-        @handleWebSocketMessage msg
+        @handleWebSocketMessage msg, id
 
-  handleWebSocketMessage: (msg) =>
-    process.stdout.write "client_#{msg.type}:#{msg.data}\n"
+      webSocket.on 'close', () =>
+        delete @sockets[id]
+        process.stdout.write "client_#{id}_status:closed\n"
 
+  handleWebSocketMessage: (msg, id) =>
+    process.stdout.write "client_#{id}_#{msg.type}:#{msg.data}\n"
+
+  sendWebSocketMessage: (msg, id) =>
+    if id
+      @sockets[id].send (JSON.stringify msg)
+    else
+      for id, socket of @sockets
+        socket.send (JSON.stringify msg)
+
+  # STDIN
   startStdinListener: () =>
-    # STDIN
     @stdin.resume()
     @stdin.setEncoding 'utf8'
     @stdin.on 'data', @handleStdin
@@ -152,10 +187,4 @@ module.exports = class Warp
       @stderr.write 'error:parse_error\n'
       return
 
-    unless @webSocket
-      @stderr.write 'error:client_not_started\n'
-      return
-
-    @webSocket.send JSON.stringify
-      type: msg[1]
-      data: msg[2]
+    @sendWebSocketMessage type: msg[1], data: msg[2]
