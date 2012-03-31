@@ -35,7 +35,7 @@ CLIENT_HTML = '''
 CLIENT_JS = """
 (function () {
 
-var soc = new WebSocket('ws://localhost:#{PORT}/', 'warp')
+var soc = new WebSocket('ws://' + location.host + '/', 'warp')
 , nop = function(){}
 , startupStack = []
 ;
@@ -103,7 +103,7 @@ module.exports = class Warp
   startHttpServer: () =>
     @httpServer = http.createServer @handleHttpRequest
     @httpServer.listen @port
-    @stdout.write "start:lotalhost:#{PORT}\n"
+    @stdout.write "start:lotalhost:#{@port}\n"
 
   handleHttpRequest: (req, res) =>
     switch url.parse(req.url).path

@@ -1,7 +1,22 @@
 #!/usr/bin/env node
-require('coffee-script')
+require('coffee-script');
+
+var opts = {}, key;
+process.argv.forEach(function(val, idx) {
+  if ( /^\-+/.test(val) ) {
+    key = val.replace(/^\-+/, '')
+    if ( !process.argv[ idx + 1 ]
+        || /^\-+/.test(process.argv[ idx + 1 ]) ) {
+      opts[ key ] = null
+    } else {
+      opts[ key ] = process.argv[ ++idx ]
+    }
+  }
+});
 
 var Warp = require('lib/warp')
-, warp = new Warp;
+, warp = new Warp({
+    port: opts.p || opts.port || 8800
+  });
 
 warp.startServer()
