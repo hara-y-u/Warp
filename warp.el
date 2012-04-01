@@ -99,7 +99,7 @@ Client on Firefox can't support this."
   :lighter " Warp"
   :group  'warp
   (if warp-mode
-      (progn (warp-start-server-process)
+      (progn (warp-start-server)
              (if warp-auto-open-client
                  (progn (sleep-for warp-auto-open-client-delay)
                         (warp-open-client)))
@@ -111,13 +111,13 @@ Client on Firefox can't support this."
 
 
 ;; User Command
-(defun warp-start-server-process ()
+(defun warp-start-server ()
   "Start warp server for current buffer"
   (interactive)
   (progn (set (make-local-variable 'warp-server-port)
               (warp-get-server-port))
          (set (make-local-variable 'warp-server-process)
-              (apply 'warp-start-server-process-internal (current-buffer)
+              (apply 'warp-start-server-process (current-buffer)
                      "-p" (number-to-string warp-server-port)
                      (append warp-server-command-args
                              (if warp-auto-close-client '("-c") nil))))))
@@ -199,7 +199,7 @@ Now, just for preventing output to be appended to buffer."
         (equal (process-status process) 'run)) t)
    (t nil)))
 
-(defun warp-start-server-process-internal (buffer &rest args)
+(defun warp-start-server-process (buffer &rest args)
   "Start warp server and returns server process.
 This function takes buffer to which bind server process to.
 Pass nil as buffer if you wish no buffer to be bound."
