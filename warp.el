@@ -95,7 +95,7 @@ Client on Firefox can't support this."
   "Hook for warp mode")
 
 (define-minor-mode warp-mode
-  "Web Application Realtime Preview minor mode"
+  "Warp minor mode"
   :lighter " Warp"
   :group  'warp
   (if warp-mode
