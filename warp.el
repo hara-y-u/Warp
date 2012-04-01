@@ -38,6 +38,7 @@
 ;;; Commands:
 
 ;;; TODO
+;;  * Stuck when large buffer is sent
 
 ;;; Code:
 
