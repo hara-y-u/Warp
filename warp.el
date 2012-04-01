@@ -38,7 +38,6 @@
 ;;; Commands:
 
 ;;; TODO
-;;  2012-03-31 Dont show process output (?) on buffer
 
 ;;; Code:
 
