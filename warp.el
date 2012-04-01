@@ -71,7 +71,7 @@ Client on Firefox can't support this."
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-html-auto-start-sending t
+(defcustom warp-html-auto-start-sending nil
   "Start sending html to the server when mode is turned on"
   :type 'boolean
   :group 'warp)
@@ -91,6 +91,20 @@ Client on Firefox can't support this."
   :type 'list
   :group 'warp)
 
+(defcustom warp-format-converter-alist
+  (list
+   '("\\.md\\|\\.markdown" (lambda ()
+                              '("sundown"))))
+  "Alist of converters used for convert specific format to html. The format is:
+
+\(\(\"Filename or Regexp\" \"Function's Symbol which returns convert command\"\)
+
+If warp-mode is enabled on buffer its file name matches \"Filename or Regexp\",
+warp-mode convert buffer string to HTML using converter command returned by
+associated function before send string to server."
+  :type 'list
+  :group 'warp)
+
 (defvar warp-mode-hook nil
   "Hook for warp mode")
 
@@ -100,10 +114,10 @@ Client on Firefox can't support this."
   :group  'warp
   (if warp-mode
       (progn (warp-start-server)
-             (if warp-auto-open-client
+             (when warp-auto-open-client
                  (progn (sleep-for warp-auto-open-client-delay)
                         (warp-open-client)))
-             (if warp-html-auto-start-sending
+             (when warp-html-auto-start-sending
                  (warp-start-sending-current-buffer))
              (run-hooks 'warp-mode-hook))
     (progn (warp-stop-sending-current-buffer)
@@ -125,7 +139,7 @@ Client on Firefox can't support this."
 (defun warp-interrupt-server ()
   "Send SIGINT to warp server"
  (interactive)
- (if (warp-process-running-p warp-server-process)
+ (when (warp-process-running-p warp-server-process)
      (interrupt-process warp-server-process)))
 
 (defun warp-send-server-string (string)
@@ -141,12 +155,52 @@ Client on Firefox can't support this."
   (unless (string-equal "" string)
           (warp-send-server-string (concat "\n__html__\n" string "\n__endhtml__\n"))))
 
-(defun warp-send-current-buffer ()
+(defun warp-buffer-string ()
+  "Get whole buffer string"
+  (save-excursion
+    (save-restriction
+      (widen) (buffer-string))))
+
+(defun warp-send-current-buffer-as-html ()
   "Send warp server current buffer content as HTML data"
   (interactive)
   (warp-send-html
    (replace-regexp-in-string "[\n]" ""
-                             (encode-coding-string (buffer-string) 'utf-8))))
+                             (encode-coding-string (warp-buffer-string) 'utf-8))))
+
+(defun warp-send-current-buffer-converting ()
+  "Send warp server current buffer content converting to HTML data."
+  (interactive)
+  (progn (warp-send-server-string "\n__html__\n")
+         (let* ((convert-command
+                (funcall (car (assoc-default buffer-file-name
+                               warp-format-converter-alist 'string-match))))
+               (convert-process
+                 (apply 'start-process "warp-convert" (current-buffer) convert-command)))
+           (set-process-query-on-exit-flag convert-process nil)
+           (set-process-filter convert-process
+                               '(lambda (process output)
+                                  (warp-send-server-string output)))
+           (set-process-sentinel convert-process
+                                 '(lambda (process event)
+                                    (when (equal (process-status process) 'exit)
+                                        (warp-send-server-string "\n__endhtml__\n"))))
+           ;; TODO: IF command need stdin
+           (process-send-string convert-process (concat (warp-buffer-string) "\n"))
+           (process-send-eof convert-process))
+         ))
+
+(defun warp-buffer-need-convert ()
+  "Determine if conversion is needed for current buffer"
+  (not (null (assoc-default buffer-file-name
+                         warp-format-converter-alist 'string-match))))
+
+(defun warp-send-current-buffer ()
+  "Send warp server current buffer. Convert string if setting for current buffer exist"
+  (interactive)
+  (if (warp-buffer-need-convert)
+      (warp-send-current-buffer-converting)
+      (warp-send-current-buffer-as-html)))
 
 (defun warp-start-sending-current-buffer ()
   "Start sending html to the server"
@@ -158,7 +212,7 @@ Client on Firefox can't support this."
 (defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
   (interactive)
-  (if (timerp warp-sending-timer)
+  (when (timerp warp-sending-timer)
       (cancel-timer warp-sending-timer)))
 
 (defun warp-open-client ()
@@ -209,7 +263,6 @@ Pass nil as buffer if you wish no buffer to be bound."
     (set-process-query-on-exit-flag process nil)
     (set-process-sentinel process 'warp-server-process-sentinel)
     (set-process-filter process 'warp-server-process-filter) process))
-
 
 ;; Provide
 (provide 'warp)
