@@ -191,11 +191,11 @@ soc.onclose = function() {
     switch chunk
       when "__html__\n"
         @mode = 'html'
-        console.log 'status:html mode'
+        #console.log 'status:html mode'
         return
       when "__endhtml__\n"
         @mode = null
-        console.log 'status:leave html mode'
+        #console.log 'status:leave html mode'
         @sendWebSocketMessage type: 'html', data: @buf.html.join('')
         @buf.html = []
         return
