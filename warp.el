@@ -60,6 +60,11 @@
   :type 'boolean
   :group 'warp)
 
+(defcustom warp-auto-open-client-delay 3
+  "Delay for auto open client"
+  :type 'integer
+  :group 'warp)
+
 (defcustom warp-auto-close-client t
   "Close client when warp-mode is turned off
 Client on Firefox can't support this."
@@ -96,7 +101,7 @@ Client on Firefox can't support this."
   (if warp-mode
       (progn (warp-start-server-process)
              (if warp-auto-open-client
-                 (progn (sleep-for 3)
+                 (progn (sleep-for warp-auto-open-client-delay)
                         (warp-open-client)))
              (if warp-html-auto-start-sending
                  (warp-start-sending-current-buffer))
