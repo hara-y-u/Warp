@@ -101,7 +101,8 @@ Client on Firefox can't support this."
              (if warp-html-auto-start-sending
                  (warp-start-sending-current-buffer))
              (run-hooks 'warp-mode-hook))
-    (warp-interrupt-server)))
+    (progn (warp-stop-sending-current-buffer)
+           (warp-interrupt-server))))
 
 
 ;; User Command
