@@ -119,7 +119,7 @@ Client on Firefox can't support this."
 
 (defun warp-interrupt-server ()
   "Send SIGINT to warp server"
-  (interactive)
+ (interactive)
   (if (processp warp-server-process)
       (interrupt-process warp-server-process)))
 
@@ -132,7 +132,8 @@ Client on Firefox can't support this."
 (defun warp-send-html (string)
   "Send string as html command data to warp server's STDIN"
   (interactive "sHTML string send to warp: ")
-  (warp-send-server-string (concat "\n__html__\n" string "\n__endhtml__\n")))
+  (unless (string-equal "" string)
+          (warp-send-server-string (concat "\n__html__\n" string "\n__endhtml__\n"))))
 
 (defun warp-send-current-buffer ()
   "Send warp server current buffer content as HTML data"
