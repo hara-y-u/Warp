@@ -125,14 +125,15 @@ Client on Firefox can't support this."
 (defun warp-interrupt-server ()
   "Send SIGINT to warp server"
  (interactive)
-  (if (processp warp-server-process)
-      (interrupt-process warp-server-process)))
+ (if (warp-process-running-p warp-server-process)
+     (interrupt-process warp-server-process)))
 
 (defun warp-send-server-string (string)
   "Send string to warp server's STDIN"
   (interactive "sString send to warp: ")
-  (if (processp warp-server-process)
-      (process-send-string warp-server-process string)))
+  (if (warp-process-running-p warp-server-process)
+      (process-send-string warp-server-process string)
+    (message "Warp: Server not running..")))
 
 (defun warp-send-html (string)
   "Send string as html command data to warp server's STDIN"
@@ -163,8 +164,9 @@ Client on Firefox can't support this."
 (defun warp-open-client ()
   "Open warp client within default browser"
   (interactive)
-  (browse-url (concat "http://localhost:" (number-to-string warp-server-port) "/")))
-
+  (if (warp-process-running-p warp-server-process)
+      (browse-url (concat "http://localhost:" (number-to-string warp-server-port) "/"))
+    (message "Warp: Server not running..")))
 
 
 ;; Fundamental
@@ -189,6 +191,13 @@ Be sure to get port number by warp-get-server-port.")
   "Sentinel for warp server process.
 Now, just for preventing output to be appended to buffer."
   nil)
+
+(defun warp-process-running-p (process)
+  "Return if process is running"
+  (cond
+   ((and (processp process)
+        (equal (process-status process) 'run)) t)
+   (t nil)))
 
 (defun warp-start-server-process-internal (buffer &rest args)
   "Start warp server and returns server process.
