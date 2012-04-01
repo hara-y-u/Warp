@@ -61,7 +61,8 @@
   :group 'warp)
 
 (defcustom warp-auto-close-client t
-  "Close client when warp-mode is turned off"
+  "Close client when warp-mode is turned off
+Client on Firefox can't support this."
   :type 'boolean
   :group 'warp)
 
@@ -70,7 +71,7 @@
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-idle-time 0.5
+(defcustom warp-idle-time 0.3
   "Time for idle detection on html sending mode"
   :type 'float
   :group 'warp)
@@ -98,7 +99,7 @@
                  (progn (sleep-for 3)
                         (warp-open-client)))
              (if warp-html-auto-start-sending
-                 (warp-html-start-sending))
+                 (warp-start-sending-current-buffer))
              (run-hooks 'warp-mode-hook))
     (warp-interrupt-server)))
 
@@ -127,26 +128,26 @@
   (if (processp warp-server-process)
       (process-send-string warp-server-process string)))
 
-(defun warp-html-command (string)
+(defun warp-send-html (string)
   "Send string as html command data to warp server's STDIN"
   (interactive "sHTML string send to warp: ")
-  (warp-send-server-string (concat "__html__\n" string "\n__endhtml__\n")))
+  (warp-send-server-string (concat "\n__html__\n" string "\n__endhtml__\n")))
 
-(defun warp-html-send-current-buffer ()
+(defun warp-send-current-buffer ()
   "Send warp server current buffer content as HTML data"
   (interactive)
-  (warp-html-command
+  (warp-send-html
    (replace-regexp-in-string "[\n]" ""
                              (encode-coding-string (buffer-string) 'utf-8))))
 
-(defun warp-html-start-sending ()
+(defun warp-start-sending-current-buffer ()
   "Start sending html to the server"
   (interactive)
   (set (make-local-variable 'warp-sending-timer)
        (run-with-idle-timer warp-idle-time t
-                       'warp-html-send-current-buffer)))
+                       'warp-send-current-buffer)))
 
-(defun warp-html-stop-sending ()
+(defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
   (interactive)
   (if (timerp warp-sending-timer)
