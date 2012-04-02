@@ -94,7 +94,10 @@ Clients opened in Firefox can't support this."
 (defcustom warp-format-converter-alist
   (list
    '("\\.md\\|\\.markdown" t (lambda ()
-                              '("sundown"))))
+                              '("sundown")))
+   '("\\.jade" t (lambda ()
+                   '("jade")))
+   )
   "Alist of converters used for convert specific format to html. The format is:
 
 \(\(\"Filename or Regexp\" \"Need STDIN Input\" \"Function's Symbol which returns convert command\"\)
