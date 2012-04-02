@@ -254,26 +254,36 @@ send current buffer string to command through STDIN."
       (warp-send-current-buffer-converting)
       (warp-send-current-buffer-as-html)))
 
+; Auto Sending
+; TODO: Running globally -> Run only for curernt buffer
+(defun warp-sending-running-p ()
+  (and (boundp 'warp-sending-timer)
+       (timerp warp-sending-timer)))
+
 (defun warp-start-sending-current-buffer ()
   "Start sending html to the server"
   (interactive)
-  (progn (set (make-local-variable 'warp-last-modified-tick) -1)
-         (set (make-local-variable 'warp-sending-timer)
-              (run-with-idle-timer
-               warp-idle-time
-               t
-               '(lambda ()
-                  (when (not (equal warp-last-modified-tick
-                                  (buffer-modified-tick)))
-                      (progn (set 'warp-last-modified-tick (buffer-modified-tick))
-                             (warp-send-current-buffer))))))))
+  (if (not (warp-sending-running-p))
+      (progn (set (make-local-variable 'warp-last-modified-tick) -1)
+             (set (make-local-variable 'warp-sending-timer)
+                  (run-with-idle-timer
+                   warp-idle-time
+                   t
+                   '(lambda ()
+                      (when (not (equal warp-last-modified-tick
+                                        (buffer-modified-tick)))
+                        (progn
+                                        ; (message "send: %s %s" warp-last-modified-tick (buffer-modified-tick))
+                          (set 'warp-last-modified-tick (buffer-modified-tick))
+                          (warp-send-current-buffer)))))))
+    (message "Warp: Already Sending to Server.."))
 
 (defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
   (interactive)
-  (when (and (boundp 'warp-sending-timer)
-             (timerp warp-sending-timer))
-      (cancel-timer warp-sending-timer)))
+  (when (warp-sending-running-p)
+    (cancel-timer warp-sending-timer)
+    (kill-local-variable warp-sending-timer)))
 
 (defun warp-open-client ()
   "Open warp client within default browser"
