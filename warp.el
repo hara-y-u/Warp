@@ -133,6 +133,7 @@ send current buffer string to command through STDIN."
      ,else))
 
 ;; User Command
+; Server
 (defun warp-start-server ()
   "Start warp server for current buffer"
   (interactive)
@@ -173,6 +174,7 @@ send current buffer string to command through STDIN."
     (save-excursion ; need this?
       (buffer-string))))
 
+; Current Buffer
 (defun warp-send-current-buffer-as-html ()
   "Send warp server current buffer content as HTML data"
   (interactive)
@@ -285,6 +287,7 @@ send current buffer string to command through STDIN."
 (defvar warp-server-command-path
   (file-name-directory (or load-file-name "."))
   "Directory of warp server command")
+; Client
 
 (defvar warp-current-server-port
   warp-server-port-base
