@@ -126,6 +126,7 @@ send current buffer string to command through STDIN."
     (progn (warp-stop-sending-current-buffer)
            (warp-interrupt-server))))
 
+; TODO: use basic function, and kill warp-server-process when stopped
 (defmacro warp-if-server-running (then else)
   "If warp-server-is running, do then. Otherwise, do else."
   `(if (warp-process-running-p ,warp-server-process)
@@ -278,7 +279,7 @@ send current buffer string to command through STDIN."
                                         ; (message "send: %s %s" warp-last-modified-tick (buffer-modified-tick))
                           (set 'warp-last-modified-tick (buffer-modified-tick))
                           (warp-send-current-buffer)))))))
-    (message "Warp: Already Sending to Server.."))
+    (message "Warp: Already Sending to Server..")))
 
 (defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
