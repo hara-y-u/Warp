@@ -60,7 +60,7 @@
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-auto-open-client-delay "3 sec"
+(defcustom warp-auto-open-client-delay "2 sec"
   "Delay for auto open client. Value will be passed to `run-at-time'"
   :type 'string
   :group 'warp)
@@ -71,7 +71,7 @@ Clients opened in Firefox can't support this."
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-html-auto-start-sending nil
+(defcustom warp-html-auto-start-sending t
   "Start sending html to the server when mode is turned on"
   :type 'boolean
   :group 'warp)
