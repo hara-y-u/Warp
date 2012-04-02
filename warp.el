@@ -240,7 +240,7 @@ send current buffer string to command through STDIN."
 ;;            (process-send-eof convert-process))
 ;;          ))
 
-(defun warp-buffer-need-convert ()
+(defun warp-buffer-need-convert-p ()
   "See if conversion is needed for current buffer"
   (not (null (assoc-default buffer-file-name
                          warp-format-converter-alist 'string-match))))
@@ -248,7 +248,7 @@ send current buffer string to command through STDIN."
 (defun warp-send-current-buffer ()
   "Send warp server current buffer. Convert string if setting for current buffer exist"
   (interactive)
-  (if (warp-buffer-need-convert)
+  (if (warp-buffer-need-convert-p)
       (warp-send-current-buffer-converting)
       (warp-send-current-buffer-as-html)))
 
