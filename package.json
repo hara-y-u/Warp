@@ -5,7 +5,6 @@
   "author": "",
   "main": "lib/warp",
   "bin": "warp",
-  "preferGlobal": true,
   "dependencies": {
     "websocket": "~1.0.4"
   },
