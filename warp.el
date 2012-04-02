@@ -56,18 +56,18 @@
   :group 'warp)
 
 (defcustom warp-auto-open-client t
-  "Open client in browser when warp-mode is turned on"
+  "Open client in browser when `warp-mode' is turned on"
   :type 'boolean
   :group 'warp)
 
 (defcustom warp-auto-open-client-delay "3 sec"
-  "Delay for auto open client. Value will be passed to run-at-time"
+  "Delay for auto open client. Value will be passed to `run-at-time'"
   :type 'string
   :group 'warp)
 
 (defcustom warp-auto-close-client t
-  "Close client when warp-mode is turned off
-Client on Firefox can't support this."
+  "Close client when `warp-mode' is turned off.
+Clients opened in Firefox can't support this."
   :type 'boolean
   :group 'warp)
 
@@ -99,8 +99,8 @@ Client on Firefox can't support this."
 
 \(\(\"Filename or Regexp\" \"Function's Symbol which returns convert command\"\)
 
-If warp-mode is enabled on buffer its file name matches \"Filename or Regexp\",
-warp-mode convert buffer string to HTML using converter command returned by
+If `warp-mode' is enabled on buffer its file name matches \"Filename or Regexp\",
+`warp-mode' convert buffer string to HTML using converter command returned by
 associated function before send string to server."
   :type 'list
   :group 'warp)
@@ -190,7 +190,7 @@ associated function before send string to server."
          ))
 
 (defun warp-buffer-need-convert ()
-  "Determine if conversion is needed for current buffer"
+  "See if conversion is needed for current buffer"
   (not (null (assoc-default buffer-file-name
                          warp-format-converter-alist 'string-match))))
 
@@ -231,7 +231,7 @@ associated function before send string to server."
 (defvar warp-current-server-port
   warp-server-port-base
   "Current port number for server.
-Be sure to get port number by warp-get-server-port.")
+Be sure to get port number by `warp-get-server-port'.")
 
 (defun warp-get-server-port ()
   "Get next port number for server."
