@@ -287,6 +287,7 @@ send current buffer string to command through STDIN."
     (cancel-timer warp-sending-timer)
     (kill-local-variable warp-sending-timer)))
 
+; Client
 (defun warp-open-client ()
   "Open warp client within default browser"
   (interactive)
@@ -299,7 +300,6 @@ send current buffer string to command through STDIN."
 (defvar warp-server-command-path
   (file-name-directory (or load-file-name "."))
   "Directory of warp server command")
-; Client
 
 (defvar warp-current-server-port
   warp-server-port-base
