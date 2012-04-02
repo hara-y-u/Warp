@@ -16,8 +16,7 @@ module.exports = class Warp
     @sockets = {}
     @socketId = 0
     @mode = null
-    @buf =
-      html: []
+    @buf = []
     process.on 'SIGINT', @onSigint
     # process.on 'uncaughtException', (err) =>
     #   @stderr.write "error:uncaught_exception #{err}\n"
@@ -187,20 +186,13 @@ soc.onclose = function() {
     @stdin.resume()
     @stdin.setEncoding 'utf8'
     @stdin.on 'data', @handleStdin
-    @stdin.on 'end', () ->
-      console.log 'status:stdin end'
+    @stdin.on 'end', @handleStdinEof
 
   handleStdin: (chunk) =>
-    switch chunk
-      when "__html__\n"
-        @mode = 'html'
-        #console.log 'status:html mode'
-        return
-      when "__endhtml__\n"
-        @mode = null
-        #console.log 'status:leave html mode'
-        @sendWebSocketMessage type: 'html', data: @buf.html.join('')
-        @buf.html = []
-        return
+    @buf.push(chunk) if /\S+/.test(chunk)
 
-    @buf.html.push(chunk) if @mode is 'html' and /\S+/.test(chunk)
+  handleStdinEof: () =>
+    data = @buf.join('')
+    ## see data format here
+    @sendWebSocketMessage type: 'html', data: data
+    @buf = []

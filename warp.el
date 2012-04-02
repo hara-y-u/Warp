@@ -162,11 +162,19 @@ send current buffer string to command through STDIN."
     ;        (message "%s" string)) ;; debug
     (message "Warp: Server not running..")))
 
+(defun warp-send-server-eof ()
+  "Send EOF to warp server's STDIN"
+  (interactive)
+  (if (warp-server-running-p)
+      (process-send-eof warp-server-process)
+    (message "Warp: Server not running..")))
+
 (defun warp-send-html (string)
   "Send string as html command data to warp server's STDIN"
   (interactive "sHTML string send to warp: ")
   (unless (string-equal "" string)
-          (warp-send-server-string (concat "\n__html__\n" string "\n__endhtml__\n"))))
+          (warp-send-server-string string)
+          (warp-send-server-eof)))
 
 (defun warp-buffer-string ()
   "Get whole buffer string"
