@@ -93,15 +93,16 @@ Clients opened in Firefox can't support this."
 
 (defcustom warp-format-converter-alist
   (list
-   '("\\.md\\|\\.markdown" (lambda ()
+   '("\\.md\\|\\.markdown" t (lambda ()
                               '("sundown"))))
   "Alist of converters used for convert specific format to html. The format is:
 
-\(\(\"Filename or Regexp\" \"Function's Symbol which returns convert command\"\)
+\(\(\"Filename or Regexp\" \"Need STDIN Input\" \"Function's Symbol which returns convert command\"\)
 
 If `warp-mode' is enabled on buffer its file name matches \"Filename or Regexp\",
 `warp-mode' convert buffer string to HTML using converter command returned by
-associated function before send string to server."
+associated function before send string to server. If Need STDIN Input is not nil,
+send current buffer string to command through STDIN."
   :type 'list
   :group 'warp)
 
@@ -122,6 +123,11 @@ associated function before send string to server."
     (progn (warp-stop-sending-current-buffer)
            (warp-interrupt-server))))
 
+(defmacro warp-if-server-running (then else)
+  "If warp-server-is running, do then. Otherwise, do else."
+  `(if (warp-process-running-p ,warp-server-process)
+       ,then
+     ,else))
 
 ;; User Command
 (defun warp-start-server ()
@@ -138,15 +144,18 @@ associated function before send string to server."
 (defun warp-interrupt-server ()
   "Send SIGINT to warp server"
  (interactive)
- (when (warp-process-running-p warp-server-process)
-     (interrupt-process warp-server-process)))
+ (warp-if-server-running
+  (interrupt-process warp-server-process)
+  (message "Warp: Server not running..")))
 
 (defun warp-send-server-string (string)
   "Send string to warp server's STDIN"
   (interactive "sString send to warp: ")
-  (if (warp-process-running-p warp-server-process)
-      (process-send-string warp-server-process string)
-    (message "Warp: Server not running..")))
+  (warp-if-server-running
+   (process-send-string warp-server-process string)
+  ; (progn (process-send-string warp-server-process string)
+  ;        (message "%s" string)) ;; debug
+   (message "Warp: Server not running..")))
 
 (defun warp-send-html (string)
   "Send string as html command data to warp server's STDIN"
@@ -156,9 +165,10 @@ associated function before send string to server."
 
 (defun warp-buffer-string ()
   "Get whole buffer string"
-  (save-excursion
-    (save-restriction
-      (widen) (buffer-string))))
+  (save-restriction
+    (widen)
+    (save-excursion ; need this?
+      (buffer-string))))
 
 (defun warp-send-current-buffer-as-html ()
   "Send warp server current buffer content as HTML data"
@@ -170,24 +180,62 @@ associated function before send string to server."
 (defun warp-send-current-buffer-converting ()
   "Send warp server current buffer content converting to HTML data."
   (interactive)
-  (progn (warp-send-server-string "\n__html__\n")
-         (let* ((convert-command
-                (funcall (car (assoc-default buffer-file-name
-                               warp-format-converter-alist 'string-match))))
-               (convert-process
-                 (apply 'start-process "warp-convert" (current-buffer) convert-command)))
-           (set-process-query-on-exit-flag convert-process nil)
-           (set-process-filter convert-process
-                               '(lambda (process output)
-                                  (warp-send-server-string output)))
-           (set-process-sentinel convert-process
-                                 '(lambda (process event)
-                                    (when (equal (process-status process) 'exit)
-                                        (warp-send-server-string "\n__endhtml__\n"))))
-           ;; TODO: IF command need stdin
-           (process-send-string convert-process (concat (warp-buffer-string) "\n"))
-           (process-send-eof convert-process))
-         ))
+  (save-restriction
+    (widen)
+    (let* (html-message
+           (convert-options
+            (assoc-default buffer-file-name
+                           warp-format-converter-alist 'string-match))
+           (need-stdin (car convert-options))
+           (convert-command-list (funcall (car (cdr convert-options))))
+           (convert-command (car convert-command-list))
+           (convert-args (cdr convert-command-list))
+           (beg (point-min))
+           (end (point-max))
+           (warp-server-process warp-server-process)
+           (buffer-output (get-buffer-create "*warp-convert*")))
+      (with-current-buffer buffer-output (erase-buffer))
+      ;(message "%s %s %s %s" beg end need-stdin convert-command)
+      (if need-stdin
+          (apply 'call-process-region
+                 beg end
+                 convert-command
+                 nil
+                 buffer-output
+                 nil
+                 convert-args)
+        (apply 'call-process
+               convert-command
+               nil
+               buffer-output
+               nil
+               convert-args))
+      (with-current-buffer buffer-output
+        (setq html-message (buffer-string)))
+      (warp-send-html html-message))))
+
+;;;; Async version (won't work well)
+;; (defun warp-send-current-buffer-converting ()
+;;   "Send warp server current buffer content converting to HTML data."
+;;   (interactive)
+;;   (progn (warp-send-server-string "\n__html__\n")
+;;          (let* ((convert-command
+;;                  (funcall (car (assoc-default buffer-file-name
+;;                                               warp-format-converter-alist 'string-match))))
+;;                 (convert-process
+;;                  (apply 'start-process "warp-convert" (current-buffer) convert-command)))
+;;            (set-process-query-on-exit-flag convert-process nil)
+;;            (set-process-filter convert-process
+;;                                '(lambda (process output)
+;;                                   (warp-send-server-string output)))
+;;            (set-process-sentinel convert-process
+;;                                  '(lambda (process event)
+;;                                     (when (equal (process-status process) 'exit)
+;;                                       (warp-send-server-string "\n__endhtml__\n"))))
+;;            ;; TODO: IF command need stdin
+;;            (process-send-string convert-process (concat (warp-buffer-string) "\n"))
+;;            (process-send-eof convert-process))
+;;          ))
 
 (defun warp-buffer-need-convert ()
   "See if conversion is needed for current buffer"
@@ -218,9 +266,9 @@ associated function before send string to server."
 (defun warp-open-client ()
   "Open warp client within default browser"
   (interactive)
-  (if (warp-process-running-p warp-server-process)
-      (browse-url (concat "http://localhost:" (number-to-string warp-server-port) "/"))
-    (message "Warp: Server not running..")))
+  (warp-if-server-running
+   (browse-url (concat "http://localhost:" (number-to-string warp-server-port) "/"))
+   (message "Warp: Server not running..")))
 
 
 ;; Fundamental
