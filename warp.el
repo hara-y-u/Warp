@@ -101,7 +101,7 @@ Clients opened in Firefox can't support this."
 
 If `warp-mode' is enabled on buffer its file name matches \"Filename or Regexp\",
 `warp-mode' convert buffer string to HTML using converter command returned by
-associated function before send string to server. If Need STDIN Input is not nil,
+associated function before send string to server. If \"Need STDIN Input\" is not nil,
 send current buffer string to command through STDIN."
   :type 'list
   :group 'warp)
