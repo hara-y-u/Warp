@@ -180,8 +180,7 @@ send current buffer string to command through STDIN."
   "Send warp server current buffer content as HTML data"
   (interactive)
   (warp-send-html
-   (replace-regexp-in-string "[\n]" ""
-                             (encode-coding-string (warp-buffer-string) 'utf-8))))
+   (encode-coding-string (warp-buffer-string) 'utf-8)))
 
 (defun warp-send-current-buffer-converting ()
   "Send warp server current buffer content converting to HTML data."
