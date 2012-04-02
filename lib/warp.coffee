@@ -30,18 +30,21 @@ module.exports = class Warp
     <title>Warp</title>
     <style>
       * { margin:0; padding:0 }
+      html {height:100%; overflow:hidden;}
       header { display:none; height:1.2em; overflow:hidden; border-bottom:solid 1px #bbb; }
       body { height:100%; width:100%; }
       iframe#warp-frame { height:100%; width:100%; border:0; }
       #closed-screen { display:none; height:100%; width:100%;
-                       text-align: center; font-size: 3em;
-                       position:absolute; left:0; top:1.2em;
-                       background-color:rgba(0,0,0,0.4); z-index: 99999;}
+                       text-align: center; font-size: 3em; color: #fff;
+                       position:absolute; left:0; top:0;
+                       background-color:rgba(0,0,0,0.8); z-index: 99999;
+                       padding: 2em;
+                      }
     </style>
     <script src="/client.js"></script>
   </head>
   <body>
-    <div id="closed-screen">It seems server has stopped :(</div>
+    <div id="closed-screen">Server not running :(</div>
     <header>
       Warp Client #<span id="client-id"/>
     </header>
