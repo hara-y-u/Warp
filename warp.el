@@ -129,6 +129,7 @@ send current buffer string to command through STDIN."
 ;; User Command
 ; Server
 (defun warp-server-running-p ()
+  (interactive)
   (and (boundp 'warp-server-process)
        (warp-process-running-p warp-server-process)))
 
@@ -148,10 +149,10 @@ send current buffer string to command through STDIN."
 (defun warp-stop-server ()
   "Stop warp server"
  (interactive)
- (if (warp-server-running-p)
-     (progn (interrupt-process warp-server-process)
-            (kill-local-variable 'warp-server-process))
-   nil))
+ (when (boundp 'warp-server-process)
+   (when (warp-process-running-p warp-server-process)
+     (interrupt-process warp-server-process))
+   (kill-local-variable 'warp-server-process)))
 
 (defun warp-send-server-string (string)
   "Send string to warp server's STDIN"
@@ -266,6 +267,7 @@ send current buffer string to command through STDIN."
 ; Auto Sending
 ; TODO: Running globally -> Run only for curernt buffer
 (defun warp-sending-running-p ()
+  (interactive)
   (and (boundp 'warp-sending-timer)
        (timerp warp-sending-timer)))
 
@@ -290,8 +292,9 @@ send current buffer string to command through STDIN."
 (defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
   (interactive)
-  (when (warp-sending-running-p)
-    (cancel-timer warp-sending-timer)
+  (when (boundp 'warp-sending-timer)
+    (when (itmerp warp-sending-timer)
+      (cancel-timer warp-sending-timer))
     (kill-local-variable 'warp-sending-timer)))
 
 ; Client
