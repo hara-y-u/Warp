@@ -150,7 +150,7 @@ send current buffer string to command through STDIN."
  (interactive)
  (if (warp-server-running-p)
      (progn (interrupt-process warp-server-process)
-            (kill-local-variable warp-server-process))
+            (kill-local-variable 'warp-server-process))
    nil))
 
 (defun warp-send-server-string (string)
@@ -284,7 +284,7 @@ send current buffer string to command through STDIN."
   (interactive)
   (when (warp-sending-running-p)
     (cancel-timer warp-sending-timer)
-    (kill-local-variable warp-sending-timer)))
+    (kill-local-variable 'warp-sending-timer)))
 
 ; Client
 (defun warp-open-client ()
