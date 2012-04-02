@@ -212,7 +212,8 @@ associated function before send string to server."
 (defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
   (interactive)
-  (when (timerp warp-sending-timer)
+  (when (and (boundp 'warp-sending-timer)
+             (timerp warp-sending-timer))
       (cancel-timer warp-sending-timer)))
 
 (defun warp-open-client ()
