@@ -281,9 +281,9 @@ send current buffer string to command through STDIN."
                    warp-idle-time
                    t
                    '(lambda ()
-                      (when (not (equal warp-last-modified-tick
-                                        (buffer-modified-tick)))
-                        (progn
+                      (when (warp-sending-running-p) ; Works only on called buffer.
+                        (when (not (equal warp-last-modified-tick
+                                          (buffer-modified-tick)))
                           ; (message "send: %s %s" warp-last-modified-tick (buffer-modified-tick))
                           (set 'warp-last-modified-tick (buffer-modified-tick))
                           (warp-send-current-buffer)))))))
