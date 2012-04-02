@@ -189,10 +189,14 @@ soc.onclose = function() {
     @stdin.on 'end', @handleStdinEof
 
   handleStdin: (chunk) =>
-    @buf.push(chunk) if /\S+/.test(chunk)
+    if /^\n+$/.test chunk
+      # Split by "\n" only line
+      data = @buf.join('')
+      ## see data format here
+      if /\S+/.test(data)
+        @sendWebSocketMessage type: 'html', data: data
+      @buf = []
+    else
+      @buf.push(chunk) if /\S+/.test(chunk)
 
   handleStdinEof: () =>
-    data = @buf.join('')
-    ## see data format here
-    @sendWebSocketMessage type: 'html', data: data
-    @buf = []

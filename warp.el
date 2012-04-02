@@ -158,23 +158,24 @@ send current buffer string to command through STDIN."
   (interactive "sString send to warp: ")
   (if (warp-server-running-p)
       (process-send-string warp-server-process string)
-    ; (progn (process-send-string warp-server-process string)
-    ;        (message "%s" string)) ;; debug
+    ;; (progn (process-send-string warp-server-process string)
+    ;;        (message "%s" string)) ;; debug
     (message "Warp: Server not running..")))
 
 (defun warp-send-server-eof ()
-  "Send EOF to warp server's STDIN"
+  "Send EOF to warp server's STDIN."
   (interactive)
   (if (warp-server-running-p)
       (process-send-eof warp-server-process)
     (message "Warp: Server not running..")))
 
-(defun warp-send-html (string)
-  "Send string as html command data to warp server's STDIN"
+(defun warp-send-string-chunk (string)
+  "Send string as a command data to warp server's STDIN"
   (interactive "sHTML string send to warp: ")
   (unless (string-equal "" string)
-          (warp-send-server-string string)
-          (warp-send-server-eof)))
+          (warp-send-server-string
+           (replace-regexp-in-string "[\n]+" "" string))
+          (warp-send-server-string "\n\n\n")))
 
 (defun warp-buffer-string ()
   "Get whole buffer string"
@@ -187,7 +188,7 @@ send current buffer string to command through STDIN."
 (defun warp-send-current-buffer-as-html ()
   "Send warp server current buffer content as HTML data"
   (interactive)
-  (warp-send-html
+  (warp-send-string-chunk
    (encode-coding-string (warp-buffer-string) 'utf-8)))
 
 (defun warp-send-current-buffer-converting ()
@@ -225,7 +226,7 @@ send current buffer string to command through STDIN."
                convert-args))
       (with-current-buffer buffer-output
         (setq html-message (buffer-string)))
-      (warp-send-html html-message))))
+      (warp-send-string-chunk html-message))))
 
 ;;;; Async version (won't work well)
 ;; (defun warp-send-current-buffer-converting ()
