@@ -100,7 +100,7 @@ Clients opened in Firefox can't support this."
    )
   "Alist of converters used for convert specific format to html. The format is:
 
-\(\(\"Filename or Regexp\" \"Need STDIN Input\" \"Function's Symbol which returns convert command\"\)
+\(\(\"Filename or Regexp\" \"Need STDIN Input\" \"Function which returns convert command in list format\"\)
 
 If `warp-mode' is enabled on buffer its file name matches \"Filename or Regexp\",
 `warp-mode' convert buffer string to HTML using converter command returned by
