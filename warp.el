@@ -60,9 +60,9 @@
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-auto-open-client-delay 3
-  "Delay for auto open client"
-  :type 'integer
+(defcustom warp-auto-open-client-delay "3 sec"
+  "Delay for auto open client. Value will be passed to run-at-time"
+  :type 'string
   :group 'warp)
 
 (defcustom warp-auto-close-client t
@@ -115,8 +115,7 @@ associated function before send string to server."
   (if warp-mode
       (progn (warp-start-server)
              (when warp-auto-open-client
-                 (progn (sleep-for warp-auto-open-client-delay)
-                        (warp-open-client)))
+                 (run-at-time warp-auto-open-client-delay nil 'warp-open-client))
              (when warp-html-auto-start-sending
                  (warp-start-sending-current-buffer))
              (run-hooks 'warp-mode-hook))
