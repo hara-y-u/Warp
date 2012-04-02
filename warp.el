@@ -255,9 +255,16 @@ send current buffer string to command through STDIN."
 (defun warp-start-sending-current-buffer ()
   "Start sending html to the server"
   (interactive)
-  (set (make-local-variable 'warp-sending-timer)
-       (run-with-idle-timer warp-idle-time t
-                       'warp-send-current-buffer)))
+  (progn (set (make-local-variable 'warp-last-modified-tick) -1)
+         (set (make-local-variable 'warp-sending-timer)
+              (run-with-idle-timer
+               warp-idle-time
+               t
+               '(lambda ()
+                  (when (not (equal warp-last-modified-tick
+                                  (buffer-modified-tick)))
+                      (progn (set 'warp-last-modified-tick (buffer-modified-tick))
+                             (warp-send-current-buffer))))))))
 
 (defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
