@@ -76,7 +76,7 @@ Clients opened in Firefox can't support this."
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-idle-time 0.3
+(defcustom warp-idle-time 0.4
   "Time for idle detection on html sending mode"
   :type 'float
   :group 'warp)
