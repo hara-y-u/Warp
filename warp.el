@@ -137,20 +137,22 @@ send current buffer string to command through STDIN."
 (defun warp-start-server ()
   "Start warp server for current buffer"
   (interactive)
-  (progn (set (make-local-variable 'warp-server-port)
-              (warp-get-server-port))
-         (set (make-local-variable 'warp-server-process)
-              (apply 'warp-start-server-process (current-buffer)
-                     "-p" (number-to-string warp-server-port)
-                     (append warp-server-command-args
-                             (if warp-auto-close-client '("-c") nil))))))
+  (warp-if-server-running
+   nil
+   (progn (set (make-local-variable 'warp-server-port)
+               (warp-get-server-port))
+          (set (make-local-variable 'warp-server-process)
+               (apply 'warp-start-server-process (current-buffer)
+                      "-p" (number-to-string warp-server-port)
+                      (append warp-server-command-args
+                              (if warp-auto-close-client '("-c") nil)))))))
 
 (defun warp-interrupt-server ()
   "Send SIGINT to warp server"
  (interactive)
  (warp-if-server-running
   (interrupt-process warp-server-process)
-  (message "Warp: Server not running..")))
+  nil))
 
 (defun warp-send-server-string (string)
   "Send string to warp server's STDIN"
