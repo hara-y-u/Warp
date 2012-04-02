@@ -124,45 +124,43 @@ send current buffer string to command through STDIN."
                  (warp-start-sending-current-buffer))
              (run-hooks 'warp-mode-hook))
     (progn (warp-stop-sending-current-buffer)
-           (warp-interrupt-server))))
-
-; TODO: use basic function, and kill warp-server-process when stopped
-(defmacro warp-if-server-running (then else)
-  "If warp-server-is running, do then. Otherwise, do else."
-  `(if (warp-process-running-p ,warp-server-process)
-       ,then
-     ,else))
+           (warp-stop-server))))
 
 ;; User Command
 ; Server
+(defun warp-server-running-p ()
+  (and (boundp 'warp-server-process)
+       (warp-process-running-p warp-server-process)))
+
 (defun warp-start-server ()
   "Start warp server for current buffer"
   (interactive)
-  (warp-if-server-running
-   nil
-   (progn (set (make-local-variable 'warp-server-port)
-               (warp-get-server-port))
-          (set (make-local-variable 'warp-server-process)
-               (apply 'warp-start-server-process (current-buffer)
-                      "-p" (number-to-string warp-server-port)
-                      (append warp-server-command-args
-                              (if warp-auto-close-client '("-c") nil)))))))
+  (if (not (warp-server-running-p))
+      (progn (set (make-local-variable 'warp-server-port)
+                  (warp-get-server-port))
+             (set (make-local-variable 'warp-server-process)
+                  (apply 'warp-start-server-process (current-buffer)
+                         "-p" (number-to-string warp-server-port)
+                         (append warp-server-command-args
+                                 (if warp-auto-close-client '("-c") nil)))))
+    nil))
 
-(defun warp-interrupt-server ()
-  "Send SIGINT to warp server"
+(defun warp-stop-server ()
+  "Stop warp server"
  (interactive)
- (warp-if-server-running
-  (interrupt-process warp-server-process)
-  nil))
+ (if (warp-server-running-p)
+     (progn (interrupt-process warp-server-process)
+            (kill-local-variable warp-server-process))
+   nil))
 
 (defun warp-send-server-string (string)
   "Send string to warp server's STDIN"
   (interactive "sString send to warp: ")
-  (warp-if-server-running
-   (process-send-string warp-server-process string)
-  ; (progn (process-send-string warp-server-process string)
-  ;        (message "%s" string)) ;; debug
-   (message "Warp: Server not running..")))
+  (if (warp-server-running-p)
+      (process-send-string warp-server-process string)
+    ; (progn (process-send-string warp-server-process string)
+    ;        (message "%s" string)) ;; debug
+    (message "Warp: Server not running..")))
 
 (defun warp-send-html (string)
   "Send string as html command data to warp server's STDIN"
@@ -292,9 +290,9 @@ send current buffer string to command through STDIN."
 (defun warp-open-client ()
   "Open warp client within default browser"
   (interactive)
-  (warp-if-server-running
-   (browse-url (concat "http://localhost:" (number-to-string warp-server-port) "/"))
-   (message "Warp: Server not running..")))
+  (if (warp-server-running-p)
+      (browse-url (concat "http://localhost:" (number-to-string warp-server-port) "/"))
+    (message "Warp: Server not running..")))
 
 
 ;; Fundamental
