@@ -270,7 +270,6 @@ send current buffer string to command through STDIN."
       (warp-send-current-buffer-as-html)))
 
 ; Auto Sending
-; TODO: Running globally -> Run only for curernt buffer
 (defun warp-sending-running-p ()
   (interactive)
   (and (boundp 'warp-sending-timer)
