@@ -293,7 +293,7 @@ send current buffer string to command through STDIN."
   "Stop sending html to the server"
   (interactive)
   (when (boundp 'warp-sending-timer)
-    (when (itmerp warp-sending-timer)
+    (when (timerp warp-sending-timer)
       (cancel-timer warp-sending-timer))
     (kill-local-variable 'warp-sending-timer)))
 
