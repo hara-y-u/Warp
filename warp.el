@@ -38,6 +38,11 @@
 ;;; Commands:
 
 ;;; TODO
+;;  * Default Keybind
+;;  * Auto Scroll to editing line
+;;  * Option: Focus when redrow
+;;  * Option: Set Custom CSS
+;;  * Feature for reload-to-check Web Application
 ;;  * Stuck when large buffer is sent
 
 ;;; Code:
