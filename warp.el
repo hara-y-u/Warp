@@ -128,8 +128,7 @@ send current buffer string to command through STDIN."
              (when warp-html-auto-start-sending
                  (warp-start-sending-current-buffer))
              (run-hooks 'warp-mode-hook))
-    (progn (warp-stop-sending-current-buffer)
-           (warp-stop-server))))
+    (warp-stop-server)))
 
 ;; User Command
 ; Server
@@ -300,6 +299,10 @@ send current buffer string to command through STDIN."
     (when (timerp warp-sending-timer)
       (cancel-timer warp-sending-timer))
     (kill-local-variable 'warp-sending-timer)))
+
+(defadvice warp-stop-server (before warp-stop-sending-before-server-stops ())
+  (warp-stop-sending-current-buffer))
+(ad-activate 'warp-stop-server)
 
 ; Client
 (defun warp-open-client ()
