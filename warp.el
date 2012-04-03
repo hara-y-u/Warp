@@ -17,25 +17,15 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-;;;Version: 0.0.1
-;; Author: yukihr (Yukihiro Hara), <yukihr [at] gmail [dot] com>
-;; URL: http://yukihr.github.com/
+;;; Version: 0.0.1
+;;  Author: yukihr (Yukihiro Hara), <yukihr [at] gmail [dot] com>
+;;  URL: http://yukihr.github.com/
 
-;;;Contributers
-
-;;;Installation
-;; Put this file into load-path'ed directory, and byte compile it if
-;; desired. And put the following expression into your ~/.emacs.
-;;
-;; (require 'warp)
-;;
-;; If you use default key map, Put the following expression into your ~/.emacs.
-;;
-;; ;;; (warp-set-default-keymap)
-
+;;; Contributers:
+;;; Installation:
 ;;; Commentary:
-
 ;;; Commands:
+;;  See README.md
 
 ;;; TODO
 ;;  * Default Keybind
