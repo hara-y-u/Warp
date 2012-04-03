@@ -7,7 +7,7 @@ process.argv.forEach(function(val, idx) {
     key = val.replace(/^\-+/, '')
     if ( !process.argv[ idx + 1 ]
         || /^\-+/.test(process.argv[ idx + 1 ]) ) {
-      opts[ key ] = null
+      opts[ key ] = true
     } else {
       opts[ key ] = process.argv[ ++idx ]
     }
@@ -17,7 +17,7 @@ process.argv.forEach(function(val, idx) {
 var Warp = require(__dirname + '/lib/warp')
 , warp = new Warp({
     port: opts.p || opts.port || 8800
-    , autoCloseClients: opts.hasOwnProperty("c")
+    , autoCloseClients: opts.c
   });
 
 warp.startServer()
