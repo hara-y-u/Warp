@@ -40,7 +40,7 @@
 ;;; TODO
 ;;  * Default Keybind
 ;;  * Auto Scroll to editing line
-;;  * Option: Focus when redrow
+;;  * Option: Focus when redraw
 ;;  * Option: Set Custom CSS
 ;;  * Feature for reload-to-check Web Application
 ;;  * Stuck when large buffer is sent
@@ -61,12 +61,14 @@
   :group 'warp)
 
 (defcustom warp-auto-open-client t
-  "Open client in browser when `warp-mode' is turned on"
+  "Open client in browser when `warp-send-server-string', if not opened yet."
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-auto-open-client-delay "2 sec"
-  "Delay for auto open client. Value will be passed to `run-at-time'"
+(defcustom warp-after-auto-open-client-send-delay "5 sec"
+  "Delay for sending after auto open client command.
+Value will be passed to `run-at-time'.
+Client's websocket should be set up after time of this option."
   :type 'string
   :group 'warp)
 
@@ -123,8 +125,6 @@ send current buffer string to command's STDIN."
   :group  'warp
   (if warp-mode
       (progn (warp-start-server)
-             (when warp-auto-open-client
-                 (run-at-time warp-auto-open-client-delay nil 'warp-open-client))
              (when warp-html-auto-start-sending
                  (warp-start-sending-current-buffer))
              (run-hooks 'warp-mode-hook))
@@ -182,6 +182,21 @@ send current buffer string to command's STDIN."
            (replace-regexp-in-string "[\n]+" "" string))
           (warp-send-server-string "\n\n\n")))
 
+(defun warp-send-string-chunk-opening-client (string)
+  (interactive "sHTML string send to warp: ")
+  (if warp-auto-open-client
+      (if (and (boundp 'warp-auto-opened-client-once) ; have auto opened
+               warp-auto-opened-client-once)
+          (warp-send-string-chunk string)
+        (warp-open-client) ; not have opened
+        (set (make-local-variable 'warp-auto-opened-client-once) t)
+        (run-at-time warp-after-auto-open-client-send-delay nil
+                     '(lambda (buffer string)
+                        (with-current-buffer buffer
+                          (warp-send-string-chunk string)))
+                     (current-buffer) string))
+    (warp-send-string-chunk string)))
+
 (defun warp-buffer-string ()
   "Get whole buffer string"
   (save-restriction
@@ -193,7 +208,7 @@ send current buffer string to command's STDIN."
 (defun warp-send-current-buffer-as-html ()
   "Send warp server current buffer content as HTML data"
   (interactive)
-  (warp-send-string-chunk
+  (warp-send-string-chunk-opening-client
    (encode-coding-string (warp-buffer-string) 'utf-8)))
 
 (defun warp-send-current-buffer-converting ()
@@ -231,7 +246,7 @@ send current buffer string to command's STDIN."
                convert-args))
       (with-current-buffer buffer-output
         (setq html-message (buffer-string)))
-      (warp-send-string-chunk html-message))))
+      (warp-send-string-chunk-opening-client html-message))))
 
 ;;;; Async version (won't work well)
 ;; (defun warp-send-current-buffer-converting ()
@@ -266,7 +281,7 @@ send current buffer string to command's STDIN."
   (interactive)
   (if (warp-buffer-need-convert-p)
       (warp-send-current-buffer-converting)
-      (warp-send-current-buffer-as-html)))
+    (warp-send-current-buffer-as-html)))
 
 ; Auto Sending
 (defun warp-sending-running-p ()
