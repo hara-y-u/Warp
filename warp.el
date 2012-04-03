@@ -103,14 +103,14 @@ Clients opened in Firefox can't support this."
    '("\\.jade" t (lambda ()
                    '("jade")))
    )
-  "Alist of converters used for convert specific format to html. The format is:
+  "Alist of converters used for converting specific format to html. The format is:
 
-\(\(\"Filename or Regexp\" \"Need STDIN Input\" \"Function which returns convert command in list format\"\)
+'\(\(\"Filename or Regexp\" \"Need STDIN Input\" \"Function which returns convert command in list format\"\)..\)
 
 If `warp-mode' is enabled on buffer its file name matches \"Filename or Regexp\",
 `warp-mode' convert buffer string to HTML using converter command returned by
 associated function before send string to server. If \"Need STDIN Input\" is not nil,
-send current buffer string to command through STDIN."
+send current buffer string to command's STDIN."
   :type 'list
   :group 'warp)
 
