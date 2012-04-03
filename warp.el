@@ -78,7 +78,7 @@ Clients opened in Firefox can't support this."
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-html-auto-start-sending t
+(defcustom warp-auto-start-sending t
   "Start sending html to the server when mode is turned on"
   :type 'boolean
   :group 'warp)
@@ -125,7 +125,7 @@ send current buffer string to command's STDIN."
   :group  'warp
   (if warp-mode
       (progn (warp-start-server)
-             (when warp-html-auto-start-sending
+             (when warp-auto-start-sending
                  (warp-start-sending-current-buffer))
              (run-hooks 'warp-mode-hook))
     (warp-stop-server)))
