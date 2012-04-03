@@ -61,7 +61,7 @@
   :group 'warp)
 
 (defcustom warp-auto-open-client t
-  "Open client in browser when `warp-send-server-string', if not opened yet."
+  "Open client in browser when emacs send buffer to server, if not opened yet."
   :type 'boolean
   :group 'warp)
 
