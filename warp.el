@@ -197,6 +197,10 @@ send current buffer string to command's STDIN."
                      (current-buffer) string))
     (warp-send-string-chunk string)))
 
+(defadvice warp-mode (after warp-kill-opened-client-once ())
+  (kill-local-variable 'warp-auto-opened-client-once)) ; clear when mode is toggled
+(ad-activate 'warp-mode)
+
 (defun warp-buffer-string ()
   "Get whole buffer string"
   (save-restriction
