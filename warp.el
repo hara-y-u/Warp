@@ -1,4 +1,4 @@
-;;;warp.el --- Web Applications Realtime Preview Minor Mode
+;;;warp.el --- Web Documents Realtime Preview Minor Mode
 ;; -*- Mode: Emacs-Lisp -*-
 
 ;; Copyright (C) 2012 by yukihr
