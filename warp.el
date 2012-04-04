@@ -36,8 +36,6 @@
 
 ;;; Code:
 
-(require 'easy-mmode)
-
 ;; Customize
 (defgroup warp nil
   "Warp mode"
