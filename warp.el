@@ -111,6 +111,7 @@ send current buffer string to command's STDIN."
 (defvar warp-mode-hook nil
   "Hook for warp mode")
 
+;;;###autoload
 (define-minor-mode warp-mode
   "Warp minor mode"
   :lighter " Warp"
@@ -172,7 +173,6 @@ send current buffer string to command's STDIN."
   (unless (string-equal "" string)
     (warp-send-server-string (concat "" string ""))))
 
-;; TODO: This should be done by macro
 (defun warp-send-string-chunk-opening-client (string)
   (interactive "sCommand string send to warp: ")
   (if warp-auto-open-client
@@ -247,7 +247,7 @@ send current buffer string to command's STDIN."
 ;; (defun warp-send-current-buffer-converting ()
 ;;   "Send warp server current buffer content converting to HTML data."
 ;;   (interactive)
-;;   (progn (warp-send-server-string "\n__html__\n")
+;;   (progn (warp-send-server-string "")
 ;;          (let* ((convert-command
 ;;                  (funcall (car (assoc-default buffer-file-name
 ;;                                               warp-format-converter-alist 'string-match))))
@@ -260,7 +260,7 @@ send current buffer string to command's STDIN."
 ;;            (set-process-sentinel convert-process
 ;;                                  '(lambda (process event)
 ;;                                     (when (equal (process-status process) 'exit)
-;;                                       (warp-send-server-string "\n__endhtml__\n"))))
+;;                                       (warp-send-server-string ""))))
 ;;            ;; TODO: IF command need stdin
 ;;            (process-send-string convert-process (concat (warp-buffer-string) "\n"))
 ;;            (process-send-eof convert-process))
