@@ -2,6 +2,8 @@
 
 http = require 'http'
 url = require 'url'
+path = require 'path'
+fs = require 'fs'
 WebSocketServer = new require('websocket').server
 
 PORT = 8898
@@ -130,17 +132,58 @@ soc.onclose = function() {
       when '/'
         res.writeHead 200, 'Content-Type': 'text/html'
         res.write @clientHtml(), 'utf-8'
+        res.end()
       when '/content.html'
         res.writeHead 200, 'Content-Type': 'text/html'
         res.write @contentHtml(), 'utf-8'
+        res.end()
       when '/client.js'
         res.writeHead 200, 'Content-Type': 'text/javascript'
         res.write @clientJs(), 'utf-8'
+        res.end()
       else
+        @sendStaticFiles req, res
+
+
+
+  sendStaticFiles: (req, res) =>
+    p = path.join process.cwd(), url.parse(req.url).path
+    ext = path.extname p
+
+    path.exists p, (exists) =>
+      unless exists
         res.writeHead 404, 'Content-Type': 'text/plain'
         res.write '404 Not Found\n'
+        res.end()
+        return
 
-    res.end()
+      fs.readFile p, 'binary', (err, file) =>
+        if err
+          res.writeHead 500, 'Content-Type': 'text/plain'
+          res.write err + "\n"
+          res.end()
+          return
+
+        switch ext
+          when 'png'
+            res.writeHead 200, 'Content-Type': 'image/png'
+          when 'gif'
+            res.writeHead 200, 'Content-Type': 'image/gif'
+          when 'jpg' or 'jpeg'
+            res.writeHead 200, 'Content-Type': 'image/jpeg'
+          when 'html' or 'htm'
+            res.writeHead 200, 'Content-Type': 'text/html'
+          when 'js'
+            res.writeHead 200, 'Content-Type': 'text/javascript'
+          when 'css'
+            res.writeHead 200, 'Content-Type': 'text/css'
+          when 'swf', 'swfl'
+            res.writeHead 200, 'Content-Type': 'application/x-shockwave-flash'
+          else
+            res.writeHead 200, 'Content-Type': 'text/plain'
+
+        res.write file, 'binary'
+        res.end()
 
   # WebSocket
   startWebSocketServer: () =>
