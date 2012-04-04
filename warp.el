@@ -69,7 +69,7 @@ Clients opened in Firefox can't support this."
   :group 'warp)
 
 (defcustom warp-idle-time 0.4
-  "Time for idle detection on html sending mode and auto scroll"
+  "Time for idle detection on html sending mode"
   :type 'float
   :group 'warp)
 
@@ -330,7 +330,7 @@ send current buffer string to command's STDIN."
     (setq-default warp-auto-scroll-timer nil)
     (set (make-local-variable 'warp-auto-scroll-timer)
          (run-with-idle-timer
-          warp-idle-time t '(lambda ()
+          0.3 t '(lambda ()
                    (when warp-auto-scroll-timer
                      (warp-scroll-to-current-line)))))))
 
