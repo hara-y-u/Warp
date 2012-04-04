@@ -168,15 +168,13 @@ send current buffer string to command's STDIN."
 
 (defun warp-send-string-chunk (string)
   "Send string as a command data to warp server's STDIN"
-  (interactive "sHTML string send to warp: ")
+  (interactive "sCommand string send to warp: ")
   (unless (string-equal "" string)
-    (warp-send-server-string "")
-    (warp-send-server-string string)
-    (warp-send-server-string "")))
+    (warp-send-server-string (concat "" string ""))))
 
 ;; TODO: This should be done by macro
 (defun warp-send-string-chunk-opening-client (string)
-  (interactive "sHTML string send to warp: ")
+  (interactive "sCommand string send to warp: ")
   (if warp-auto-open-client
       (if (and (boundp 'warp-auto-opened-client-once) ; have auto opened
                warp-auto-opened-client-once)
@@ -341,7 +339,7 @@ Be sure to get port number by `warp-get-server-port'.")
 
 (defun warp-server-process-filter (process output)
   "Receive warp server outputs"
-  (message "Warp: %s" (replace-regexp-in-string "\n+$" "" output)))
+  (message "Warp Server: %s" (replace-regexp-in-string "\n+$" "" output)))
 
 (defun warp-server-process-sentinel (process event)
   "Sentinel for warp server process.
