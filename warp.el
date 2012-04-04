@@ -28,10 +28,12 @@
 ;;  See README.md
 
 ;;; TODO
+;;  * Blak lines should able to be sent to server for render <pre/>.
 ;;  * Default Keybind
 ;;  * Auto Scroll to editing line
 ;;  * Option: Focus when redraw
 ;;  * Option: Set Custom CSS
+;;  * Load Static Img, CSS..
 ;;  * Feature for reload-to-check Web Application
 ;;  * Stuck when large buffer is sent
 
@@ -168,10 +170,11 @@ send current buffer string to command's STDIN."
   "Send string as a command data to warp server's STDIN"
   (interactive "sHTML string send to warp: ")
   (unless (string-equal "" string)
-          (warp-send-server-string
-           (replace-regexp-in-string "[\n]+" "" string))
-          (warp-send-server-string "\n\n\n")))
+    (warp-send-server-string "")
+    (warp-send-server-string string)
+    (warp-send-server-string "")))
 
+;; TODO: This should be done by macro
 (defun warp-send-string-chunk-opening-client (string)
   (interactive "sHTML string send to warp: ")
   (if warp-auto-open-client

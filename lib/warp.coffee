@@ -16,7 +16,8 @@ module.exports = class Warp
     @sockets = {}
     @socketId = 0
     @mode = null
-    @buf = []
+    @buf = ''
+    @isReceivingText = false
     process.on 'SIGINT', @onSigint
     # process.on 'uncaughtException', (err) =>
     #   @stderr.write "error:uncaught_exception #{err}\n"
@@ -189,14 +190,20 @@ soc.onclose = function() {
     @stdin.on 'end', @handleStdinEof
 
   handleStdin: (chunk) =>
-    if /^\n+$/.test chunk
-      # Split by "\n" only line
-      data = @buf.join('')
-      ## see data format here
-      if /\S+/.test(data)
-        @sendWebSocketMessage type: 'html', data: data
-      @buf = []
-    else
-      @buf.push(chunk) if /\S+/.test(chunk)
+    for char in chunk
+      if char is "\x01"
+        @isReceivingText = true
+        continue
+      else if char is "\x02"
+        @isReceivingText = false
+        if /\S+/.test @buf
+          @sendWebSocketMessage type: 'html', data: @buf
+        @buf = ''
+        continue
+
+      if @isReceivingText
+        @buf += char
+
+      false
 
   handleStdinEof: () =>
