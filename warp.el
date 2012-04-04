@@ -57,12 +57,12 @@
   :type 'boolean
   :group 'warp)
 
-(defcustom warp-after-auto-open-client-send-delay "5 sec"
-  "Delay for sending after auto open client command.
-Value will be passed to `run-at-time'.
-Client's websocket should be set up after time of this option."
-  :type 'string
-  :group 'warp)
+;; (defcustom warp-after-auto-open-client-send-delay "5 sec"
+;;   "Delay for sending after auto open client command.
+;; Value will be passed to `run-at-time'.
+;; Client's websocket should be set up after time of this option."
+;;   :type 'string
+;;   :group 'warp)
 
 (defcustom warp-auto-close-client t
   "Close client when `warp-mode' is turned off.
@@ -171,22 +171,21 @@ send current buffer string to command's STDIN."
   "Send string as a command data to warp server's STDIN"
   (interactive "sCommand string send to warp: ")
   (unless (string-equal "" string)
-    (warp-send-server-string (concat "" string ""))))
+    (warp-send-server-string "")
+    (warp-send-server-string string)
+    (warp-send-server-string "\n")
+    (warp-send-server-string "\n")
+    ))
 
 (defun warp-send-string-chunk-opening-client (string)
   (interactive "sCommand string send to warp: ")
-  (if warp-auto-open-client
-      (if (and (boundp 'warp-auto-opened-client-once) ; have auto opened
-               warp-auto-opened-client-once)
-          (warp-send-string-chunk string)
-        (warp-open-client) ; not have opened
-        (set (make-local-variable 'warp-auto-opened-client-once) t)
-        (run-at-time warp-after-auto-open-client-send-delay nil
-                     '(lambda (buffer string)
-                        (with-current-buffer buffer
-                          (warp-send-string-chunk string)))
-                     (current-buffer) string))
-    (warp-send-string-chunk string)))
+  ;; Warp server will cache sended command, and send it to clients when they are opened.
+  (progn (warp-send-string-chunk string)
+         (when warp-auto-open-client
+           (unless (and (boundp 'warp-auto-opened-client-once) ; have auto opened
+                        warp-auto-opened-client-once)
+             (warp-open-client) ; not have opened
+             (set (make-local-variable 'warp-auto-opened-client-once) t)))))
 
 (defadvice warp-mode (after warp-kill-opened-client-once ())
   (kill-local-variable 'warp-auto-opened-client-once)) ; clear when mode is toggled
