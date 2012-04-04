@@ -11,16 +11,12 @@ module.exports = class Warp
     @autoCloseClients = options.autoCloseClients
     @port   = options.port   or PORT
     @stdin  = process.stdin
-    @stdout = process.stdout
-    @stderr = process.stderr
     @sockets = {}
     @socketId = 0
-    @mode = null
-    @buf = ''
+    @buf = []
+    @lastHtml = ''
     @isReceivingText = false
     process.on 'SIGINT', @onSigint
-    # process.on 'uncaughtException', (err) =>
-    #   @stderr.write "error:uncaught_exception #{err}\n"
 
   # Static
   clientHtml: () => '''
@@ -174,6 +170,9 @@ soc.onclose = function() {
 
   handleWebSocketMessage: (msg, id) =>
     console.log "client_#{id}_#{msg.type}:#{msg.data}"
+    if msg.type is 'status'
+      if msg.data is 'start'
+        @sendWebSocketMessage type: 'html', data: @lastHtml
 
   sendWebSocketMessage: (msg, id) =>
     if id
@@ -196,13 +195,15 @@ soc.onclose = function() {
         continue
       else if char is "\x02"
         @isReceivingText = false
-        if /\S+/.test @buf
-          @sendWebSocketMessage type: 'html', data: @buf
-        @buf = ''
+        tmp = @buf.join('')
+        if /\S+/.test tmp
+          @lastHtml = tmp
+          @sendWebSocketMessage type: 'html', data: @lastHtml
+        @buf = []
         continue
 
       if @isReceivingText
-        @buf += char
+        @buf.push(char)
 
       false
 
