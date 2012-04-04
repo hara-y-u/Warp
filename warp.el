@@ -54,13 +54,6 @@
   :type 'boolean
   :group 'warp)
 
-;; (defcustom warp-after-auto-open-client-send-delay "5 sec"
-;;   "Delay for sending after auto open client command.
-;; Value will be passed to `run-at-time'.
-;; Client's websocket should be set up after time of this option."
-;;   :type 'string
-;;   :group 'warp)
-
 (defcustom warp-auto-close-client t
   "Close client when `warp-mode' is turned off.
 Clients opened in Firefox can't support this."
@@ -68,12 +61,12 @@ Clients opened in Firefox can't support this."
   :group 'warp)
 
 (defcustom warp-auto-start-sending t
-  "Start sending html to the server when mode is turned on"
+  "Start sending html to the server when warp-mode is turned on"
   :type 'boolean
   :group 'warp)
 
 (defcustom warp-auto-start-auto-scroll t
-  "Start sending html to the server when mode is turned on"
+  "Start auto-scrolling clients when warp-mode is turned on"
   :type 'boolean
   :group 'warp)
 
