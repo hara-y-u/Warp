@@ -28,12 +28,9 @@
 ;;  See README.md
 
 ;;; TODO
-;;  * Blak lines should able to be sent to server for render <pre/>.
 ;;  * Default Keybind
-;;  * Auto Scroll to editing line
 ;;  * Option: Focus when redraw
 ;;  * Option: Set Custom CSS
-;;  * Load Static Img, CSS..
 ;;  * Feature for reload-to-check Web Application
 ;;  * Stuck when large buffer is sent
 
@@ -75,8 +72,13 @@ Clients opened in Firefox can't support this."
   :type 'boolean
   :group 'warp)
 
+(defcustom warp-auto-start-auto-scroll t
+  "Start sending html to the server when mode is turned on"
+  :type 'boolean
+  :group 'warp)
+
 (defcustom warp-idle-time 0.4
-  "Time for idle detection on html sending mode"
+  "Time for idle detection on html sending mode and auto scroll"
   :type 'float
   :group 'warp)
 
@@ -120,6 +122,8 @@ send current buffer string to command's STDIN."
       (progn (warp-start-server)
              (when warp-auto-start-sending
                  (warp-start-sending-current-buffer))
+             (when warp-auto-start-auto-scroll
+                 (warp-start-auto-scroll))
              (run-hooks 'warp-mode-hook))
     (warp-stop-server)))
 
@@ -151,6 +155,15 @@ send current buffer string to command's STDIN."
      (interrupt-process warp-server-process))
    (kill-local-variable 'warp-server-process)))
 
+; Client
+(defun warp-open-client ()
+  "Open warp client within default browser"
+  (interactive)
+  (if (warp-server-running-p)
+      (browse-url (concat "http://localhost:" (number-to-string warp-server-port) "/"))
+    (message "Warp: Server not running..")))
+
+; Server Command
 (defun warp-send-server-string (string)
   "Send string to warp server's STDIN"
   (interactive "sString send to warp: ")
@@ -191,6 +204,7 @@ send current buffer string to command's STDIN."
   (kill-local-variable 'warp-auto-opened-client-once)) ; clear when mode is toggled
 (ad-activate 'warp-mode)
 
+; Current Buffer
 (defun warp-buffer-string ()
   "Get whole buffer string"
   (save-restriction
@@ -198,7 +212,6 @@ send current buffer string to command's STDIN."
     (save-excursion ; need this?
       (buffer-string))))
 
-; Current Buffer
 (defun warp-send-current-buffer-as-html ()
   "Send warp server current buffer content as HTML data"
   (interactive)
@@ -265,7 +278,7 @@ send current buffer string to command's STDIN."
 ;;            (process-send-eof convert-process))
 ;;          ))
 
-(defun warp-buffer-need-convert-p ()
+(defun warp-current-buffer-need-convert-p ()
   "See if conversion is needed for current buffer"
   (not (null (assoc-default buffer-file-name
                          warp-format-converter-alist 'string-match))))
@@ -273,7 +286,7 @@ send current buffer string to command's STDIN."
 (defun warp-send-current-buffer ()
   "Send warp server current buffer. Convert string if setting for current buffer exist"
   (interactive)
-  (if (warp-buffer-need-convert-p)
+  (if (warp-current-buffer-need-convert-p)
       (warp-send-current-buffer-converting)
     (warp-send-current-buffer-as-html)))
 
@@ -304,22 +317,44 @@ send current buffer string to command's STDIN."
 (defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
   (interactive)
-  (when (boundp 'warp-sending-timer)
-    (when (timerp warp-sending-timer)
-      (cancel-timer warp-sending-timer))
-    (kill-local-variable 'warp-sending-timer)))
+  (warp-kill-buffer-local-timer 'warp-sending-timer))
 
+; Scroll
+(defun warp-get-scroll-point ()
+  (interactive)
+  (/ (* (current-line) 100) (count-lines (point-min) (point-max))))
+
+(defun warp-scroll-client-to (number)
+  (interactive "n")
+  (warp-send-string-chunk (concat "scroll" (number-to-string number))))
+
+(defun warp-scroll-to-current-line ()
+  (interactive)
+  (warp-scroll-client-to (warp-get-scroll-point)))
+
+; Auto Scroll
+(defun warp-start-auto-scroll ()
+  (interactive)
+  (progn
+    (setq-default warp-auto-scroll-timer nil)
+    (set (make-local-variable 'warp-auto-scroll-timer)
+         (run-with-idle-timer
+          warp-idle-time t '(lambda ()
+                   (when warp-auto-scroll-timer
+                     (warp-scroll-to-current-line)))))))
+
+(defun warp-stop-auto-scroll ()
+  (interactive)
+  (warp-kill-buffer-local-timer 'warp-auto-scroll-timer))
+
+; Stop Auto Sending/Scroll
 (defadvice warp-stop-server (before warp-stop-sending-before-server-stops ())
   (warp-stop-sending-current-buffer))
-(ad-activate 'warp-stop-server)
 
-; Client
-(defun warp-open-client ()
-  "Open warp client within default browser"
-  (interactive)
-  (if (warp-server-running-p)
-      (browse-url (concat "http://localhost:" (number-to-string warp-server-port) "/"))
-    (message "Warp: Server not running..")))
+(defadvice warp-stop-server (before warp-stop-auto-scroll-before-server-stops ())
+  (warp-stop-auto-scroll))
+
+(ad-activate 'warp-stop-server)
 
 
 ;; Fundamental
@@ -362,6 +397,14 @@ Pass nil as buffer if you wish no buffer to be bound."
     (set-process-query-on-exit-flag process nil)
     (set-process-sentinel process 'warp-server-process-sentinel)
     (set-process-filter process 'warp-server-process-filter) process))
+
+(defun warp-kill-buffer-local-timer (timer-symbol)
+  "Stop timer boud to local buffer, and kill timer valiable."
+  (let ((timer (symbol-value timer-symbol)))
+  (when (boundp timer-symbol)
+     (when (timerp timer)
+       (cancel-timer timer))
+     (kill-local-variable timer-symbol))))
 
 ;; Provide
 (provide 'warp)

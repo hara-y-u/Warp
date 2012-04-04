@@ -62,7 +62,10 @@ var soc = new WebSocket('ws://' + location.host + '/', 'warp')
 startupStack.push(function() {
   soc.send(JSON.stringify({ type:'status', data:'start' }));
 
-  var frame = document.getElementById('warp-frame');
+  var frame = document.getElementById('warp-frame')
+  , doc = frame.contentDocument
+  , docHeight, scrollTo
+  ;
 
   soc.onmessage = function(msg) {
     msg = JSON.parse(msg.data);
@@ -76,14 +79,16 @@ startupStack.push(function() {
         frame.contentWindow.location.href = msg.data;
         break;
       case 'html':
-        frame.contentDocument.documentElement.innerHTML = msg.data;
-        document.title = frame.contentDocument.title
-          //.replace(/<!doctype[^>]*>/i, '').replace(/<\\/?html[^>]*>/i, '');
+        // Remember Scroll Position
+        scrollTo = doc.documentElement.scrollTop || doc.body.scrollTop;
+        doc.documentElement.innerHTML = msg.data;
+        document.title = frame.contentDocument.title;
+        frame.contentWindow.scrollTo(0, scrollTo);
         break;
       case 'scroll':
-        var docHeight = document.documentElement.scrollHeight || document.body.scrollHeight
+        docHeight = doc.documentElement.scrollHeight || doc.body.scrollHeight
         , scrollTo = msg.data / 100 * docHeight;
-        frame.contentWindow.scrollTo(scrollTo);
+        frame.contentWindow.scrollTo(0, scrollTo);
         break;
       case 'client_id':
         document.getElementById('client-id').innerText = msg.data;
