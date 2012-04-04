@@ -80,6 +80,11 @@ startupStack.push(function() {
         document.title = frame.contentDocument.title
           //.replace(/<!doctype[^>]*>/i, '').replace(/<\\/?html[^>]*>/i, '');
         break;
+      case 'scroll':
+        var docHeight = document.documentElement.scrollHeight || document.body.scrollHeight
+        , scrollTo = msg.data / 100 * docHeight;
+        frame.contentWindow.scrollTo(scrollTo);
+        break;
       case 'client_id':
         document.getElementById('client-id').innerText = msg.data;
         break;
@@ -143,8 +148,6 @@ soc.onclose = function() {
         res.end()
       else
         @sendStaticFiles req, res
-
-
 
   sendStaticFiles: (req, res) =>
     p = path.join process.cwd(), url.parse(req.url).path
@@ -239,9 +242,7 @@ soc.onclose = function() {
       else if char is "\x02"
         @isReceivingText = false
         tmp = @buf.join('')
-        if /\S+/.test tmp
-          @lastHtml = tmp
-          @sendWebSocketMessage type: 'html', data: @lastHtml
+        @handleCommand tmp
         @buf = []
         continue
 
@@ -249,5 +250,20 @@ soc.onclose = function() {
         @buf.push(char)
 
       false
+
+  handleCommand: (command) =>
+    try
+      if command[0] is "\x1B" # special command
+        type = (command.match /^\x1B(\S+)\x1D/)[1]
+        data = (command.match /\x1D(\S+)/)[1]
+        @sendWebSocketMessage type: type, data: data
+      else # html command
+        if /\S+/.test command
+          @lastHtml = command
+          @sendWebSocketMessage type: 'html', data: @lastHtml
+        else
+          console.log "Blank HTML Data."
+    catch e
+      console.log e
 
   handleStdinEof: () =>
