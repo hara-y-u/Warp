@@ -158,7 +158,9 @@ soc.onclose = function() {
     p = path.join process.cwd(), url.parse(req.url).path
     ext = path.extname p
 
-    path.exists p, (exists) =>
+    _exists = fs.exists or path.exists
+
+    _exists p, (exists) =>
       unless exists
         res.writeHead 404, 'Content-Type': 'text/plain'
         res.write '404 Not Found\n'
