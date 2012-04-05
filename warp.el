@@ -171,7 +171,7 @@ send current buffer string to command's STDIN."
       (process-send-eof warp-server-process)
     (message "Warp: Server not running..")))
 
-(defun warp-send-string-chunk (string)
+(defun warp-send-command (string)
   "Send string as a command data to warp server's STDIN"
   (interactive "sCommand string send to warp: ")
   (unless (string-equal "" string)
@@ -184,7 +184,7 @@ send current buffer string to command's STDIN."
 (defun warp-send-string-chunk-opening-client (string)
   (interactive "sCommand string send to warp: ")
   ;; Warp server will cache sended command, and send it to clients when they are opened.
-  (progn (warp-send-string-chunk string)
+  (progn (warp-send-command string)
          (when warp-auto-open-client
            (unless (and (boundp 'warp-auto-opened-client-once) ; have auto opened
                         warp-auto-opened-client-once)
@@ -316,8 +316,8 @@ send current buffer string to command's STDIN."
   (/ (* (current-line) 100) (count-lines (point-min) (point-max))))
 
 (defun warp-scroll-client-to (number)
-  (interactive "n")
-  (warp-send-string-chunk (concat "scroll" (number-to-string number))))
+  (interactive "nScroll Position: ")
+  (warp-send-command (concat "scroll" (number-to-string number))))
 
 (defun warp-scroll-to-current-line ()
   (interactive)
