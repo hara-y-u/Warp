@@ -17,7 +17,6 @@ module.exports = class Warp
     @socketId = 0
     @buf = []
     @lastHtml = ''
-    @isReceivingText = false
     process.on 'SIGINT', @onSigint
 
   # Static
@@ -243,22 +242,17 @@ soc.onclose = function() {
 
   handleStdin: (chunk) =>
     for char in chunk
-      if char is "\x02"
-        @isReceivingText = true
-        continue
-      else if char is "\x03"
-        @isReceivingText = false
-        tmp = @buf.join('')
-        @handleCommand tmp
+      if char is "\x00" # Separate Command On Null
+        @handleCommand @buf.join('')
         @buf = []
-        continue
-
-      if @isReceivingText
+      else
         @buf.push(char)
 
-      false
+    false
 
   handleCommand: (command) =>
+    #console.log command
+    command = command.replace /^\n+/, '' # normalize
     try
       if command[0] is "\x1B" # special command
         type = (command.match /^\x1B(\S+)\x1D/)[1]
