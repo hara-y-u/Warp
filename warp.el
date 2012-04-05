@@ -348,7 +348,8 @@ send current buffer string to command's STDIN."
   (interactive)
   (warp-kill-buffer-local-timer 'warp-auto-scroll-timer))
 
-; Stop Auto Sending/Scroll
+; Stop Auto Sending/Scroll when server stops
+; TODO: to listener called in sentinel
 (defadvice warp-stop-server (before warp-stop-sending-before-server-stops ())
   (warp-stop-sending-current-buffer))
 
