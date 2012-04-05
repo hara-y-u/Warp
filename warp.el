@@ -159,7 +159,8 @@ Be sure to get port number by `warp-get-server-port'.")
 (defmacro warp-add-server-listener (when fn)
   `(let* ((list-sym (intern (concat "warp-" ,when "-server-listeners")))
           (list (symbol-value list-sym)))
-     (set list-sym (append '(,fn) list))))
+     (or (member ',fn list) ; dont add same fn
+         (set list-sym (append '(,fn) list)))))
 
 ; Basic Funcs
 (defun warp-get-server-port ()
@@ -400,9 +401,11 @@ Pass nil as buffer if you wish no buffer to be bound."
                            (warp-send-current-buffer)))))))
     (message "Warp: Already Sending to Server..")))
 
-(warp-add-server-listener "start" (lambda ()
-                                    (when warp-auto-start-sending
-                                      (warp-start-sending-current-buffer))))
+(defun warp-start-sending-if-set ()
+  (when warp-auto-start-sending
+    (warp-start-sending-current-buffer)))
+
+(warp-add-server-listener "start" warp-start-sending-if-set)
 
 (defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
@@ -427,9 +430,11 @@ Pass nil as buffer if you wish no buffer to be bound."
                     (when warp-auto-scroll-timer
                       (warp-scroll-to-current-line)))))))
 
-(warp-add-server-listener "start" (lambda ()
-                                    (when warp-auto-start-auto-scroll
-                                      (warp-start-auto-scroll))))
+(defun warp-start-auto-scroll-if-set ()
+  (when warp-auto-start-auto-scroll
+    (warp-start-auto-scroll)))
+
+(warp-add-server-listener "start" warp-start-auto-scroll-if-set)
 
 (defun warp-stop-auto-scroll ()
   (interactive)
