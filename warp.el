@@ -159,6 +159,11 @@ Be sure to get port number by `warp-get-server-port'.")
 (defvar warp-stop-server-listeners '()
   "Executed when server stop.")
 
+(defmacro warp-add-server-listener (when fn)
+  `(let* ((list-sym (intern (concat "warp-" ,when "-server-listeners")))
+          (list (symbol-value list-sym)))
+     (set list-sym (append '(,fn) list))))
+
 (defun warp-get-server-port ()
   "Get next port number for server."
   (setq warp-current-server-port (1+ warp-current-server-port)))
@@ -236,13 +241,11 @@ Pass nil as buffer if you wish no buffer to be bound."
     (unless warp-auto-opened-client-once ; have auto opened
       (warp-open-client) ; not have opened
       (setq warp-auto-opened-client-once t))))
-(setq warp-start-server-listeners
-      (append '(warp-open-client-if-set) warp-start-server-listeners))
+(warp-add-server-listener "start" warp-open-client-if-set)
 
 (defun warp-reset-open-client-flag ()
   (setq warp-auto-opened-client-once nil)) ; clear when server stops
-(setq warp-stop-server-listeners
-      (append '(warp-reset-open-client-flag) warp-stop-server-listeners))
+(warp-add-server-listener "stop" warp-reset-open-client-flag)
 
 
 ; Server Command
@@ -386,8 +389,7 @@ Pass nil as buffer if you wish no buffer to be bound."
   (interactive)
   (progn (cancel-timer warp-auto-sending-timer)
          (setq warp-auto-sending-timer nil)))
-(setq warp-stop-server-listeners
-      (append '(warp-stop-sending-current-buffer) warp-stop-server-listeners))
+(warp-add-server-listener "stop" warp-stop-sending-current-buffer)
 
 ; Scroll
 (defun warp-get-scroll-point ()
@@ -430,8 +432,7 @@ Pass nil as buffer if you wish no buffer to be bound."
   (interactive)
   (progn (cancel-timer warp-auto-scroll-timer)
          (setq warp-auto-scroll-timer nil)))
-(setq warp-stop-server-listeners
-      (append '(warp-stop-auto-scroll) warp-stop-server-listeners))
+(warp-add-server-listener "stop" warp-stop-auto-scroll)
 
 
 ;; Provide
