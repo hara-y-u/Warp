@@ -313,7 +313,17 @@ send current buffer string to command's STDIN."
 ; Scroll
 (defun warp-get-scroll-point ()
   (interactive)
-  (/ (* (current-line) 100) (count-lines (point-min) (point-max))))
+  (let ((full-lines (count-lines (point-min) (point-max)))
+        (window-lines (count-lines (window-start) (window-end)))
+        (lines-from-window-top (count-lines (window-start) (point)))
+        (lines-to-window-top (count-lines (point-min) (window-start))))
+    (cond
+     ((equal (current-line) 1) 0)
+     ((equal (current-line) full-lines) 100)
+     (t (/ (* 100 (+
+                   (* lines-to-window-top window-lines)
+                   (expt lines-from-window-top 2)))
+           (* full-lines window-lines))))))
 
 (defun warp-scroll-client-to (number)
   (interactive "nScroll Position: ")
