@@ -79,11 +79,11 @@ startupStack.push(function() {
         frame.contentWindow.location.href = msg.data;
         break;
       case 'html':
-        // Remember Scroll Position
-        scrollTo = doc.documentElement.scrollTop || doc.body.scrollTop;
+        // // Remember Scroll Position
+        // scrollTo = doc.documentElement.scrollTop || doc.body.scrollTop;
         doc.documentElement.innerHTML = msg.data;
         document.title = frame.contentDocument.title;
-        frame.contentWindow.scrollTo(0, scrollTo);
+        // frame.contentWindow.scrollTo(0, scrollTo);
         break;
       case 'scroll':
         docHeight = doc.documentElement.scrollHeight || doc.body.scrollHeight
