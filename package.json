@@ -2,7 +2,7 @@
   "name": "warp",
   "description": "Warp to WebPage!",
   "version": "0.0.1",
-  "author": "yukihr@gmail.com",
+  "author": "Yukihiro Hara <yukihr@gmail.com>",
   "main": "lib/warp",
   "bin": "warp",
   "dependencies": {
