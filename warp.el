@@ -110,10 +110,6 @@ send current buffer string to command's STDIN."
   :group  'warp
   (if warp-mode
       (progn (warp-start-server)
-             (when warp-auto-start-sending
-                 (warp-start-sending-current-buffer))
-             (when warp-auto-start-auto-scroll
-                 (warp-start-auto-scroll))
              (run-hooks 'warp-mode-hook))
     (warp-stop-server)))
 
@@ -142,6 +138,7 @@ send current buffer string to command's STDIN."
 (defvar warp-auto-scroll-timer nil
   "Save timer for auto scroll.")
 (make-variable-buffer-local 'warp-auto-scroll-timer)
+
 
 ;; Fundamental
 (defvar warp-server-command-path
@@ -241,10 +238,12 @@ Pass nil as buffer if you wish no buffer to be bound."
     (unless warp-auto-opened-client-once ; have auto opened
       (warp-open-client) ; not have opened
       (setq warp-auto-opened-client-once t))))
+
 (warp-add-server-listener "start" warp-open-client-if-set)
 
 (defun warp-reset-open-client-flag ()
   (setq warp-auto-opened-client-once nil)) ; clear when server stops
+
 (warp-add-server-listener "stop" warp-reset-open-client-flag)
 
 
@@ -384,11 +383,16 @@ Pass nil as buffer if you wish no buffer to be bound."
                            (warp-send-current-buffer)))))))
     (message "Warp: Already Sending to Server..")))
 
+(warp-add-server-listener "start" (lambda ()
+                                    (when warp-auto-start-sending
+                                      (warp-start-sending-current-buffer))))
+
 (defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
   (interactive)
   (progn (cancel-timer warp-auto-sending-timer)
          (setq warp-auto-sending-timer nil)))
+
 (warp-add-server-listener "stop" warp-stop-sending-current-buffer)
 
 ; Scroll
@@ -428,10 +432,15 @@ Pass nil as buffer if you wish no buffer to be bound."
                     (when warp-auto-scroll-timer
                       (warp-scroll-to-current-line)))))))
 
+(warp-add-server-listener "start" (lambda ()
+                                    (when warp-auto-start-auto-scroll
+                                      (warp-start-auto-scroll))))
+
 (defun warp-stop-auto-scroll ()
   (interactive)
   (progn (cancel-timer warp-auto-scroll-timer)
          (setq warp-auto-scroll-timer nil)))
+
 (warp-add-server-listener "stop" warp-stop-auto-scroll)
 
 
