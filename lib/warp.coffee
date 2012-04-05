@@ -241,10 +241,10 @@ soc.onclose = function() {
 
   handleStdin: (chunk) =>
     for char in chunk
-      if char is "\x01"
+      if char is "\x02"
         @isReceivingText = true
         continue
-      else if char is "\x02"
+      else if char is "\x03"
         @isReceivingText = false
         tmp = @buf.join('')
         @handleCommand tmp

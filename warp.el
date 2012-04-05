@@ -175,9 +175,9 @@ send current buffer string to command's STDIN."
   "Send string as a command data to warp server's STDIN"
   (interactive "sCommand string send to warp: ")
   (unless (string-equal "" string)
-    (warp-send-server-string "")
+    (warp-send-server-string "")
     (warp-send-server-string string)
-    (warp-send-server-string "\n")
+    (warp-send-server-string "\n")
     (warp-send-server-string "\n")
     ))
 
