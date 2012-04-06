@@ -1,10 +1,10 @@
-<!-- CSS From: https://github.com/clownfart/Markdown-CSS -->
+<!-- Local CSS From: https://github.com/clownfart/Markdown-CSS -->
 <link href="markdown.css" rel="stylesheet"></link>
 
 # Warp
 
-<!-- Load from local. -->
-![Warp](warp.gif)
+<!-- Load remote. -->
+![Warp](https://github.com/yukihr/Warp/raw/master/warp.gif)
 
 Warp provides Emacs with ability of realtime preview of html documents and documents which can be converted to htmls.
 
