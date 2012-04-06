@@ -173,7 +173,7 @@ soc.onclose = function() {
           res.end()
           return
 
-        switch ext
+        switch ext.substr 1
           when 'png'
             res.writeHead 200, 'Content-Type': 'image/png'
           when 'gif'
