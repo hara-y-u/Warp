@@ -45,38 +45,37 @@
   :group 'warp)
 
 (defcustom warp-auto-open-client t
-  "Open client in browser when emacs send buffer to server, if not opened yet."
+  "Open client in browser automatically."
   :type 'boolean
   :group 'warp)
 
 (defcustom warp-auto-close-client t
-  "Close client when `warp-mode' is turned off.
-Clients opened in Firefox can't support this."
+  "Close client when warp server stops."
   :type 'boolean
   :group 'warp)
 
 (defcustom warp-auto-start-sending t
-  "Start sending html to the server when warp-mode is turned on"
+  "Start sending html to the server automatically."
   :type 'boolean
   :group 'warp)
 
 (defcustom warp-auto-start-auto-scroll t
-  "Start auto-scrolling clients when warp-mode is turned on"
+  "Start scroll syncing automatically."
   :type 'boolean
   :group 'warp)
 
 (defcustom warp-idle-time 0.4
-  "Time for idle detection on html sending mode"
+  "Time for idle detection on html sending."
   :type 'number
   :group 'warp)
 
 (defcustom warp-server-command "warp"
-  "Warp server command"
+  "Warp server command."
   :type 'string
   :group 'warp)
 
 (defcustom warp-server-command-args nil
-  "Arguments for warp server command"
+  "Default arguments for warp server command."
   :type 'list
   :group 'warp)
 
