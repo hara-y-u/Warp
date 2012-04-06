@@ -28,7 +28,6 @@
 ;;  See README.md
 
 ;;; TODO
-;;  * Default Keybind
 ;;  * Option: Set Custom CSS
 ;;  * Feature for reload-to-check Web Application
 
@@ -97,6 +96,32 @@ send current buffer string to command's STDIN."
   :type 'list
   :group 'warp)
 
+(defcustom warp-mode-commands-prefix "\C-c\C-w"
+  "Prefix keybind for warp-mode commands."
+  :type 'string
+  :group 'warp)
+
+(defcustom warp-mode-commands-keymap
+  '(("s" . 'warp-start-server)
+    ("i" . 'warp-stop-server)
+    ("o" . 'warp-open-client)
+    ("w" . 'warp-send-current-buffer)
+    )
+  "Keymap for warp-mode.
+Each keys are preceded by `warp-mode-commands-keymap'."
+  :type 'list
+  :group 'warp)
+
+(defvar warp-mode-map (make-sparse-keymap)
+  "Key map for Warp minor mode.")
+
+(defun warp-bind-key-to-func (key func)
+  (eval `(define-key warp-mode-map
+           ,(format "%s%s" warp-mode-commands-prefix key) ,func)))
+
+(dolist (el warp-mode-commands-keymap)
+  (warp-bind-key-to-func (car el) (cdr el)))
+
 (defvar warp-mode-hook nil
   "Hook for warp mode")
 
@@ -104,7 +129,8 @@ send current buffer string to command's STDIN."
 (define-minor-mode warp-mode
   "Warp minor mode"
   :lighter " Warp"
-  :group  'warp
+  :group   'warp
+  :keymap  warp-mode-map
   (if warp-mode
       (progn (warp-start-server)
              (run-hooks 'warp-mode-hook))
