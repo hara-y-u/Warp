@@ -31,7 +31,6 @@
 ;;  * Default Keybind
 ;;  * Option: Set Custom CSS
 ;;  * Feature for reload-to-check Web Application
-;;  * Stuck when large buffer is sent
 
 ;;; Code:
 
@@ -69,7 +68,7 @@ Clients opened in Firefox can't support this."
 
 (defcustom warp-idle-time 0.4
   "Time for idle detection on html sending mode"
-  :type 'float
+  :type 'number
   :group 'warp)
 
 (defcustom warp-server-command "warp"
@@ -83,10 +82,10 @@ Clients opened in Firefox can't support this."
   :group 'warp)
 
 (defcustom warp-format-converter-alist
-  (list
-   '("\\.md\\|\\.markdown" t (lambda ()
-                              '("markdown")))
-   )
+  '(
+    ("\\.md\\|\\.markdown" t (lambda ()
+                               '("markdown")))
+    )
   "Alist of converters used for converting specific format to html. The format is:
 
 '\(\(\"Filename or Regexp\" \"Need STDIN Input\" \"Function which returns convert command in list format\"\)..\)
