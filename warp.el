@@ -86,8 +86,6 @@ Clients opened in Firefox can't support this."
   (list
    '("\\.md\\|\\.markdown" t (lambda ()
                               '("markdown")))
-   '("\\.jade" t (lambda ()
-                   '("jade")))
    )
   "Alist of converters used for converting specific format to html. The format is:
 
