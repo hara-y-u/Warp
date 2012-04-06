@@ -184,7 +184,7 @@ soc.onclose = function() {
         return
 
       # Supress Chutternig Display
-      res.setHeader "Cache-Control", "max-age=15"
+      res.setHeader "Cache-Control", "max-age=100"
 
       fs.readFile p, 'binary', (err, file) =>
         if err
