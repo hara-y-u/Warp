@@ -31,7 +31,7 @@ Warp provides Emacs with ability of realtime preview of html documents and docum
 2. Clone this repository.
 
         $ cd /path/to/your/repos
-        $ git clone https://github.com/yukihr/warp.git
+        $ git clone https://github.com/yukihr/Warp.git 
 
 3. Install `websocket` npm module.
 
