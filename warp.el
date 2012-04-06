@@ -38,7 +38,7 @@
 ;;;;;;;;; Customize ;;;;;;;;;
 (defgroup warp nil
   "Warp mode"
-  :group 'convenience
+  :group 'editing
   :prefix "warp-")
 
 (defcustom warp-server-port-base 8800
