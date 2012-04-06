@@ -85,7 +85,7 @@ Clients opened in Firefox can't support this."
 (defcustom warp-format-converter-alist
   (list
    '("\\.md\\|\\.markdown" t (lambda ()
-                              '("sundown")))
+                              '("markdown")))
    '("\\.jade" t (lambda ()
                    '("jade")))
    )
