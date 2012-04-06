@@ -63,7 +63,8 @@ startupStack.push(function() {
 
   var frame = document.getElementById('warp-frame')
   , doc = frame.contentDocument
-  , docHeight, scrollTo
+  , scrollTo, point, inTop, inOffset, screen, docHeight
+  , top, screenDelta, scrollTo
   ;
 
   soc.onmessage = function(msg) {
@@ -85,8 +86,19 @@ startupStack.push(function() {
         // frame.contentWindow.scrollTo(0, scrollTo);
         break;
       case 'scroll':
-        docHeight = doc.documentElement.scrollHeight || doc.body.scrollHeight
-        , scrollTo = msg.data / 100 * docHeight;
+        point = msg.data.split(' ')
+        , inTop = parseInt(point[0], 10)
+        , inOffset = parseInt(point[1], 10)
+        , inScreen = parseInt(point[2], 10)
+        , docHeight = doc.documentElement.scrollHeight || doc.body.scrollHeight
+        , screen = doc.documentElement.clientHeight / docHeight * 100
+        , top = (doc.documentElement.scrollTop || doc.body.scrollTop) / docHeight * 100
+        , screenDelta = inScreen - screen
+        ;
+        scrollTo = (inTop * docHeight / 100)               // = Length to Window Top
+                   + (screenDelta >= 0 ? screenDelta : 0)  // Positive when browser screen is narrow than editor
+                   * docHeight / 100                       // = Hidden Screen Height
+                   * inOffset / 100;
         frame.contentWindow.scrollTo(0, scrollTo);
         break;
       case 'client_id':
@@ -264,7 +276,7 @@ soc.onclose = function() {
     try
       if command[0] is "\x1B" # special command
         type = (command.match /^\x1B(\S+)\x1D/)[1]
-        data = (command.match /\x1D(\S+)/)[1]
+        data = (command.match /\x1D([\w ]+)/)[1]
         @sendWebSocketMessage type: type, data: data
       else # html command
         if /\S+/.test command

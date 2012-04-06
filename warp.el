@@ -355,22 +355,26 @@ Pass nil as buffer if you wish no buffer to be bound."
 
 ; Scroll
 (defun warp-get-scroll-point ()
+  "Get scroll point for request server scroll.
+   Returns list that format is (top offset screen)
+   Where,
+     top    is {Lines to Window Top}   / {Full Lines}      * 100
+     offset is {Lines from Window Top} / {Lines in Window} * 100
+     screen is {Lines in Window}       / {Full Lines}      * 100"
   (interactive)
-  (let ((full-lines (count-lines (point-min) (point-max)))
-        (window-lines (count-lines (window-start) (window-end)))
-        (lines-from-window-top (count-lines (window-start) (point)))
-        (lines-to-window-top (count-lines (point-min) (window-start))))
-    (cond
-     ((equal (current-line) 1) 0)
-     ((equal (current-line) full-lines) 100)
-     (t (/ (* 100 (+
-                   (* lines-to-window-top window-lines)
-                   (expt lines-from-window-top 2)))
-           (* full-lines window-lines))))))
+  (let* ((full-lines            (count-lines (point-min) (point-max)))
+         (window-lines          (count-lines (window-start) (window-end)))
+         (lines-to-window-top   (count-lines (point-min) (window-start)))
+         (lines-from-window-top (count-lines (window-start) (point)))
+         (top                   (/ (* 100 lines-to-window-top) full-lines))
+         (offset                (+ 2 (/ (* 100 lines-from-window-top) window-lines)))
+         (screen                (/ (* 100 window-lines) full-lines)))
+    (list top offset screen)))
 
-(defun warp-scroll-client-to (number)
-  (interactive "nScroll Position: ")
-  (warp-send-command (concat "scroll" (number-to-string number))))
+(defun warp-scroll-client-to (point)
+  (warp-send-command
+   (concat "scroll"
+           (mapconcat 'number-to-string point " "))))
 
 (defun warp-scroll-to-current-line ()
   (interactive)
