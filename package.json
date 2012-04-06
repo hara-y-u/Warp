@@ -1,8 +1,6 @@
 {
-  "name": "warp",
-  "description": "Warp to WebPage!",
-  "version": "0.0.1",
-  "author": "Yukihiro Hara <yukihr@gmail.com>",
+  "name": "Warp",
+  "description": "Warp!",
   "main": "lib/warp",
   "bin": "warp",
   "dependencies": {

@@ -1,7 +1,7 @@
 ;;;warp.el --- Web Documents Realtime Preview Minor Mode
 ;; -*- Mode: Emacs-Lisp -*-
 
-;; Copyright (C) 2012 by yukihr
+;; Copyright (C) 2012 by yukihiro hara
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ;;; Version: 0.0.1
-;;  Author: yukihr (Yukihiro Hara), <yukihr [at] gmail [dot] com>
+;;  Author: yukihiro hara <yukihr@gmail.com>
 ;;  URL: http://yukihr.github.com/
 
 ;;; Contributers:
