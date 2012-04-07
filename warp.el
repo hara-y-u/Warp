@@ -118,8 +118,9 @@ Each keys are preceded by `warp-mode-commands-keymap'."
   (eval `(define-key warp-mode-map
            ,(format "%s%s" warp-mode-commands-prefix key) ,func)))
 
-(dolist (el warp-mode-commands-keymap)
-  (warp-bind-key-to-func (car el) (cdr el)))
+(defun warp-setup-mode-keybinds ()
+  (dolist (el warp-mode-commands-keymap)
+    (warp-bind-key-to-func (car el) (cdr el))))
 
 (defvar warp-mode-hook nil
   "Hook for warp mode")
@@ -131,8 +132,10 @@ Each keys are preceded by `warp-mode-commands-keymap'."
   :group   'warp
   :keymap  warp-mode-map
   (if warp-mode
-      (progn (warp-start-server)
-             (run-hooks 'warp-mode-hook))
+      (progn
+        (warp-setup-mode-keybinds)
+        (warp-start-server)
+        (run-hooks 'warp-mode-hook))
     (warp-stop-server)))
 
 
