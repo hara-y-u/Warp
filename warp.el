@@ -17,9 +17,9 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-;;; Version: 0.0.1
-;;  Author: yukihiro hara <yukihr@gmail.com>
-;;  URL: http://yukihr.github.com/
+;; Author: yukihiro hara <yukihr@gmail.com>
+;; URL: http://github.com/yukihr/Warp
+;; Version: 0.0.1
 
 ;;; Contributers:
 ;;; Installation:
