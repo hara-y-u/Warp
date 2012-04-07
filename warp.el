@@ -79,14 +79,15 @@
   :type 'list
   :group 'warp)
 
-(defcustom warp-format-converter-alist
-  '(
-    ("\\.md\\|\\.markdown" t (lambda ()
-                               '("markdown")))
-    )
+(defcustom warp-format-converter-alist '()
   "Alist of converters used for converting specific format to html. The format is:
 
 '\(\(\"Filename or Regexp\" \"Need STDIN Input\" \"Function which returns convert command in list format\"\)..\)
+
+e.g.) Setting for Markdown
+\(add-to-list 'warp-format-converter-alist
+ '(\"\\.md\\|\\.markdown\" t (lambda ()
+                            '(\"markdown\"))))
 
 If `warp-mode' is enabled on buffer its file name matches \"Filename or Regexp\",
 `warp-mode' converts buffer string to HTML using converter command returned by
