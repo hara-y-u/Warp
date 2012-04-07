@@ -28,19 +28,21 @@ Warp provides Emacs with ability of realtime preview of html documents and docum
 
 1. Install `node.js` with [package](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager) or [nave](https://github.com/isaacs/nave).
 
-2. Clone this repository.
+2. Install [npm](http://npmjs.org/) .
+
+3. Clone this repository.
 
         $ cd /path/to/your/repos
         $ git clone https://github.com/yukihr/Warp.git 
 
-3. Install `websocket` npm module.
+4. Install `websocket` npm module.
 
         $ cd warp
         $ npm install
 
     or, for grobal install, execute `npm install -g websocket`
   
-4. Put following lines into your ~/.emacs.d/init.el or other init file.
+5. Put following lines into your ~/.emacs.d/init.el or other init file.
 
         (add-to-list 'load-path "/path/to/warp-directory")
         (require 'warp)
@@ -70,10 +72,6 @@ Warp provides Emacs with ability of realtime preview of html documents and docum
 4. Execute warp-mode command.
 
         M-x warp-mode
-
-   or
-
-        C-c C-w C-w
 
 
 ## Usage
