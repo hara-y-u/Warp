@@ -59,8 +59,6 @@ var soc = new WebSocket('ws://' + location.host + '/', 'warp')
 ;
 
 startupStack.push(function() {
-  soc.send(JSON.stringify({ type:'status', data:'start' }));
-
   var frame = document.getElementById('warp-frame')
   , doc = frame.contentDocument
   , scrollTo, point, inTop, inOffset, screen, docHeight
@@ -109,6 +107,7 @@ startupStack.push(function() {
     }
   };
 
+  soc.send(JSON.stringify({ type:'status', data:'start' }));
 });
 
 startupStack.push(nop);
