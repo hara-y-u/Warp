@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Warp by yukihr</title>
+    
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Warp</h1>
+        <p>Realtime HTML Preview for Emacs</p>
+        <p class="view"><a href="https://github.com/yukihr/Warp">View the Project on GitHub <small>yukihr/Warp</small></a></p>
+        <ul>
+          <li><a href="https://github.com/yukihr/Warp/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/yukihr/Warp/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/yukihr/Warp">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Warp</h1>
+
+<p>Warp provides Emacs with ability of realtime preview of html documents and documents which can be converted to htmls.</p>
+
+<h2>Features</h2>
+
+<ul>
+<li>Realtime HTML Preview using WebSocket</li>
+<li>Auto Open/Close Browser Preview Window</li>
+<li>Auto Scroll Synchronizing</li>
+<li>Supports a Number of Formats</li>
+</ul><h2>Confirmed Environment</h2>
+
+<ul>
+<li>Node.js 0.6.11/0.7.2</li>
+<li>Emacs 23.3</li>
+<li>Latest Google Chrome</li>
+</ul><h2>Install</h2>
+
+<ol>
+<li><p>Install <code>node.js</code> with <a href="https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager">package</a> or <a href="https://github.com/isaacs/nave">nave</a>.</p></li>
+<li><p>Install <a href="http://npmjs.org/">npm</a> .</p></li>
+<li>
+<p>Clone this repository.</p>
+
+<pre><code>$ cd /path/to/your/repos
+$ git clone <a href="https://github.com/yukihr/Warp.git">https://github.com/yukihr/Warp.git</a> 
+</code></pre>
+</li>
+<li>
+<p>Install <code>websocket</code> npm module.</p>
+
+<pre><code>$ cd warp
+$ npm install
+</code></pre>
+
+<p>or, for grobal install, execute <code>npm install -g websocket</code></p>
+</li>
+<li>
+<p>Put following lines into your ~/.emacs.d/init.el or other init file.</p>
+
+<pre><code>(add-to-list 'load-path "/path/to/warp-directory")
+(require 'warp)
+(global-set-key (kbd "C-c C-w C-w") warp-mode) ;; Modify key bind as you want.
+;; Set markdown converter (if you want)
+(add-to-list 'warp-format-converter-alist
+             '("\\.md\\|\\.markdown" t (lambda ()
+                                         ;; Set command you are using
+                                         '("markdown"))))
+;; Below line is needed if you installed websocket npm module globally.
+(setenv "NODE_PATH" "/path/to/global/node_modules")
+;; or, if you have setup NODE_PATH in the shell
+(setenv "NODE_PATH"
+        (replace-regexp-in-string
+         "\n+$" "" (shell-command-to-string "echo $NODE_PATH")))
+</code></pre>
+</li>
+</ol><h3>Confirmation</h3>
+
+<ol>
+<li><p>Restart Emacs once you have installed Warp.</p></li>
+<li><p>Install <a href="http://daringfireball.net/projects/markdown/">Markdown</a> command line tool into directory in the PATH.</p></li>
+<li>
+<p>Open this README.</p>
+
+<pre><code>C-x C-f /path/to/warp-directory/README.md
+</code></pre>
+</li>
+<li>
+<p>Execute warp-mode command.</p>
+
+<pre><code>M-x warp-mode
+</code></pre>
+</li>
+</ol><h2>Usage</h2>
+
+<p>In the document's buffer you want to see preview, execute <code>warp-mode</code> command.
+By default, a browser tab (or window if you don't have any) will open and html-rendered preview of the buffer will be displayed in real time.
+After finished editing, execute <code>warp-mode</code> again or simply kill buffer to disable preview.</p>
+
+<h2>Commands</h2>
+
+<p>Below commands are bound to specific key bind by default.</p>
+
+<ul>
+<li>warp-start-server</li>
+</ul><p>Start Warp server. Bound to <code>C-c C-w s</code>.</p>
+
+<ul>
+<li>warp-stop-server</li>
+</ul><p>Stop Warp server. Bound to <code>C-c C-w i</code>.</p>
+
+<ul>
+<li>warp-open-client</li>
+</ul><p>Open Warp client. Bound to <code>C-c C-w o</code>.</p>
+
+<ul>
+<li>warp-send-current-buffer</li>
+</ul><p>Send current buffer to Warp server, convert buffer if needed. Bound to <code>C-c C-w w</code>.</p>
+
+<p>For reference of other commands, please take a look inside <code>warp.el</code>.</p>
+
+<h2>Customize</h2>
+
+<p>Exec <code>M-x customize-group RET warp</code> to see all customize options.</p>
+
+<h3>init.el Examples</h3>
+
+<ul>
+<li>
+<p>Disable auto refresh and scroll syncing.</p>
+
+<pre><code>(custom-set-variables
+ '(warp-auto-start-sending nil)
+ '(warp-auto-start-auto-scroll nil))
+</code></pre>
+</li>
+<li>
+<p>Set custom converter.</p>
+
+<pre><code>(add-to-list 'warp-format-converter-alist
+             '("\\.textile" t (lambda () '("redcloth"))))
+</code></pre>
+</li>
+</ul><h2>Known Issues</h2>
+
+<ul>
+<li>Stuck when editing too large buffer.</li>
+<li>Client's display will be chattering when resources are fetched from server not browser cache.</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/yukihr">yukihr</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+  </body>
+</html>
