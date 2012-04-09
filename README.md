@@ -19,9 +19,9 @@ Warp provides Emacs with ability of realtime preview of html documents and docum
 
 ## Confirmed Environment
 
-- Node.js 0.6.11/0.7.2
+- Node.js 0.6.11, 0.7.2
 - Emacs 23.3
-- Latest Google Chrome
+- Latest Google Chrome, Mozilla Firefox
 
 
 ## Install

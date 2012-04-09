@@ -56,14 +56,15 @@ module.exports = class Warp
 var soc = new WebSocket('ws://' + location.host + '/', 'warp')
 , nop = function(){}
 , startupStack = []
+, frame, doc
 ;
 
 startupStack.push(function() {
-  var frame = document.getElementById('warp-frame')
-  , doc = frame.contentDocument
-  , scrollTo, point, inTop, inOffset, screen, docHeight
+  var scrollTo, point, inTop, inOffset, screen, docHeight
   , top, screenDelta, scrollTo
   ;
+
+  doc = frame.contentDocument;
 
   soc.onmessage = function(msg) {
     msg = JSON.parse(msg.data);
@@ -114,7 +115,14 @@ startupStack.push(nop);
 soc.onopen = function() { startupStack.pop()(); };
 
 startupStack.push(nop);
-document.addEventListener('DOMContentLoaded', function() { startupStack.pop()(); });
+document.addEventListener('DOMContentLoaded', function() {
+  // On Firefox, have to wait loading of iframe,
+  // because doc will have reference to empty content before load.
+  frame = document.getElementById('warp-frame');
+  frame.onload = function() {
+    startupStack.pop()();
+  }
+});
 
 startupStack.pop()();
 
