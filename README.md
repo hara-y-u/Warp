@@ -119,8 +119,23 @@ Exec `M-x customize-group RET warp` to see all customize options.
          
 - Set custom converter.
 
-        (add-to-list 'warp-format-converter-alist
-                     '("\\.textile" t (lambda () '("redcloth"))))
+    - [textile](http://redcloth.org/textile)
+
+            (add-to-list 'warp-format-converter-alist
+                         '("\\.textile" t (lambda () '("redcloth"))))
+
+    - [github-markup](https://github.com/github/markup) (Not tested all formats..)
+
+            (add-to-list 'warp-format-converter-alist
+                         '("\\.md\\|\\.markdown\\|\\.textile\\|\\.rdoc\\|\\.org\\|\\.creole\\|\\.mediawiki\\|\\.rst\\|\\.asciidoc\\|\\.pod"
+                           nil
+                           (lambda ()
+                             (let* ((string (buffer-string))
+                                    (ext (file-name-extension (buffer-file-name)))
+                                    (temp-file (concat "warp-temp." ext)))
+                               (with-temp-file temp-file
+                                 (insert string))
+                               (list "github-markup" temp-file)))))
     
 
 ## Known Issues
