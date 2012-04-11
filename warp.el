@@ -135,6 +135,7 @@ Each keys are preceded by `warp-mode-commands-keymap'."
   (if warp-mode
       (progn
         (warp-setup-mode-keybinds)
+        (warp-setup-server-hooks)
         (warp-start-server)
         (run-hooks 'warp-mode-hook))
     (warp-stop-server)))
@@ -166,6 +167,14 @@ Each keys are preceded by `warp-mode-commands-keymap'."
   "Save timer for auto scroll.")
 (make-variable-buffer-local 'warp-auto-scroll-timer)
 
+(defvar warp-server-start-hook '()
+  "Executed when server start.")
+(make-variable-buffer-local 'warp-server-start-hook)
+
+(defvar warp-server-stop-hook '()
+  "Executed when server stop.")
+(make-variable-buffer-local 'warp-server-stop-hook)
+
 ; Global Variables
 (defvar warp-server-command-path
   (file-name-directory (or load-file-name "."))
@@ -175,18 +184,6 @@ Each keys are preceded by `warp-mode-commands-keymap'."
   warp-server-port-base
   "Current port number for server.
 Be sure to get port number by `warp-get-server-port'.")
-
-(defvar warp-start-server-listeners '()
-  "Executed when server start.")
-
-(defvar warp-stop-server-listeners '()
-  "Executed when server stop.")
-
-(defmacro warp-add-server-listener (when fn)
-  `(let* ((list-sym (intern (concat "warp-" ,when "-server-listeners")))
-          (list (symbol-value list-sym)))
-     (or (member ',fn list) ; dont add same fn
-         (set list-sym (append '(,fn) list)))))
 
 ; Basic Funcs
 (defun warp-get-server-port ()
@@ -207,10 +204,9 @@ Be sure to get port number by `warp-get-server-port'.")
 (defun warp-server-process-sentinel (process event)
   "Sentinel for warp server process."
   (progn
-    ; stop listeners
+    ; stop hook
     (when (equal (process-status process) 'exit)
-      (dolist (fn warp-stop-server-listeners)
-        (funcall fn)))))
+      (run-hooks 'warp-server-stop-hook))))
 
 (defun warp-start-server-process (buffer &rest args)
   "Start warp server and returns server process.
@@ -222,7 +218,7 @@ Pass nil as buffer if you wish no buffer to be bound."
     (set-process-query-on-exit-flag process nil)
     (set-process-sentinel process 'warp-server-process-sentinel)
     (set-process-filter process 'warp-server-process-filter)
-    ; start listeners
+    ; start hook
     (let ((exitp
            (catch 'break
              (while (not (equalp (process-status process) 'run))
@@ -230,8 +226,7 @@ Pass nil as buffer if you wish no buffer to be bound."
                  (throw 'break t))
                (sleep-for 0 10))))) ; wait till start
       (if (not exitp)
-        (dolist (fn warp-start-server-listeners)
-          (funcall fn))
+          (run-hooks 'warp-server-start-hook)
         (message "Warp: Process abnormally exited.")))
     process))
 
@@ -435,8 +430,6 @@ Pass nil as buffer if you wish no buffer to be bound."
   (when warp-auto-start-sending
     (warp-start-sending-current-buffer)))
 
-(warp-add-server-listener "start" warp-start-sending-if-set)
-
 (defun warp-stop-sending-current-buffer ()
   "Stop sending html to the server"
   (interactive)
@@ -444,7 +437,6 @@ Pass nil as buffer if you wish no buffer to be bound."
            (cancel-timer warp-auto-sending-timer))
          (setq warp-auto-sending-timer nil)))
 
-(warp-add-server-listener "stop" warp-stop-sending-current-buffer)
 
 ; Auto Scroll
 (defun warp-auto-scroll-running-p ()
@@ -464,15 +456,12 @@ Pass nil as buffer if you wish no buffer to be bound."
   (when warp-auto-start-auto-scroll
     (warp-start-auto-scroll)))
 
-(warp-add-server-listener "start" warp-start-auto-scroll-if-set)
-
 (defun warp-stop-auto-scroll ()
   (interactive)
   (progn (when (timerp warp-auto-scroll-timer)
            (cancel-timer warp-auto-scroll-timer))
          (setq warp-auto-scroll-timer nil)))
 
-(warp-add-server-listener "stop" warp-stop-auto-scroll)
 
 ; Auto Open Client
 (defun warp-open-client-if-set ()
@@ -481,13 +470,31 @@ Pass nil as buffer if you wish no buffer to be bound."
       (warp-open-client) ; not have opened
       (setq warp-auto-opened-client-once t))))
 
-(warp-add-server-listener "start" warp-open-client-if-set)
-
 (defun warp-reset-open-client-flag ()
   (setq warp-auto-opened-client-once nil)) ; clear when server stops
 
-(warp-add-server-listener "stop" warp-reset-open-client-flag)
+;;;;;;;;; hooks ;;;;;;;;;
+(defun warp-setup-server-hooks ()
+  (progn
+    (add-hook 'warp-server-start-hook 'warp-start-sending-if-set)
+    (add-hook 'warp-server-stop-hook 'warp-stop-sending-current-buffer)
+    (add-hook 'warp-server-start-hook 'warp-start-auto-scroll-if-set)
+    (add-hook 'warp-server-stop-hook 'warp-stop-auto-scroll)
+    (add-hook 'warp-server-start-hook 'warp-open-client-if-set)
+    (add-hook 'warp-server-stop-hook 'warp-reset-open-client-flag)
+    ; teardown
+    (add-hook 'warp-server-stop-hook 'warp-teardown-server-hooks)))
 
+(defun warp-teardown-server-hooks ()
+  (progn
+    (remove-hook 'warp-server-start-hook 'warp-start-sending-if-set t)
+    (remove-hook 'warp-server-stop-hook 'warp-stop-sending-current-buffer t)
+    (remove-hook 'warp-server-start-hook 'warp-start-auto-scroll-if-set t)
+    (remove-hook 'warp-server-stop-hook 'warp-stop-auto-scroll t)
+    (remove-hook 'warp-server-start-hook 'warp-open-client-if-set t)
+    (remove-hook 'warp-server-stop-hook 'warp-reset-open-client-flag t)
+    ; remove self
+    (remove-hook 'warp-server-stop-hook 'warp-teardown-server-hooks t)))
 
 ;;;;;;;;; Provide ;;;;;;;;;
 (provide 'warp)
