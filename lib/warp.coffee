@@ -12,7 +12,8 @@ module.exports = class Warp
   constructor: (options = {}) ->
     @autoCloseClients = options.autoCloseClients
     @showHeader = options.showHeader
-    @port   = options.port   or PORT
+    @enableClientLog = options.enableClientLog
+    @port   = options.port or PORT
     @stdin  = process.stdin
     @sockets = {}
     @socketId = 0
@@ -77,7 +78,7 @@ startupStack.push(function() {
 
   soc.onmessage = function(msg) {
     msg = JSON.parse(msg.data);
-    console.log(msg.type, msg.data);
+    #{ if @enableClientLog then "console.log(msg.type, msg.data);" else "" }
     switch (msg.type) {
       case 'reload':
         frame.src = frame.src;

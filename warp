@@ -19,6 +19,7 @@ var Warp = require(__dirname + '/lib/warp')
     port: opts.p || opts.port || 8800
     , autoCloseClients: opts.c
     , showHeader: opts.h
+    , enableClientLog: opts.l
   });
 
 warp.startServer()
