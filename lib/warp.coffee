@@ -46,12 +46,12 @@ module.exports = class Warp
   clientCss: () => """
 * { margin:0; padding:0 }
 html {height:100%; overflow:hidden;}
-header { #{ if @showHeader then "" else "display:none;" }
+header { #{ if @showHeader then '' else 'display:none;' }
          height:1rem; position:fixed; width:100%;
          overflow:hidden; border-bottom:solid 1px #bbb; }
 header > ul > li { display: inline; margin: 1rem; }
 body { height:100%; width:100%; }
-iframe#warp-frame { height:100%; width:100%; border:0; #{ if @showHeader then "margin-top:1.2rem" else "" }}
+iframe#warp-frame { height:100%; width:100%; border:0; #{ if @showHeader then 'margin-top:1.2rem' else '' }}
 #closed-screen { display:none; height:100%; width:100%;
                  text-align: center; font-size: 3em; color: #fff;
                  position:absolute; left:0; top:0;
@@ -78,7 +78,7 @@ startupStack.push(function() {
 
   soc.onmessage = function(msg) {
     msg = JSON.parse(msg.data);
-    #{ if @enableClientLog then "console.log(msg.type, msg.data);" else "" }
+    #{ if @enableClientLog then 'console.log(msg.type, msg.data);' else '' }
     switch (msg.type) {
       case 'reload':
         frame.src = frame.src;
@@ -86,7 +86,7 @@ startupStack.push(function() {
       case 'load':
       case 'url':
         frame.src = msg.data;
-        document.getElementById('loaded-url').innerText = msg.data;
+        document.getElementById('loaded-url').innerHTML = '<a href=\"'+msg.data+'\" target=\"_blank\">' + msg.data + '</a>';
         break;
       case 'html':
         // // Remember Scroll Position
