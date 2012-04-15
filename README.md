@@ -141,4 +141,4 @@ Exec `M-x customize-group RET warp` to see all customize options.
 ## Known Issues
 
 - Stuck when editing too large buffer.
-- Client's display will be chattering when resources are fetched from server not browser cache.
+- Client's display will chatter when resources are fetched from server not browser cache.
