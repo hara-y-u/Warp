@@ -4,7 +4,7 @@
 # Warp
 
 <!-- Load remote. -->
-![Warp](https://github.com/yukihr/Warp/raw/master/readme/warp.gif)
+<!-- ![Warp](https://github.com/yukihr/Warp/raw/master/readme/warp.gif) -->
 
 Warp provides Emacs with ability of realtime preview of html documents and documents which can be converted to htmls.
 
@@ -142,3 +142,26 @@ Exec `M-x customize-group RET warp` to see all customize options.
 
 - Stuck when editing too large buffer.
 - Client's display will chatter when resources are fetched from server not browser cache.
+
+
+## Extra
+
+### warp-reload.el
+
+`warp-reload.el` provides global minor mode to load specific url on save buffers.
+
+#### Setup
+
+Put following lines to your ~/.emacs.d/init.el
+
+        ;; ;; if you haven't set up yet
+        ;; (add-to-list 'load-path "/path/to/warp-directory")
+        ;; (require 'warp) 
+        (require 'warp-reload)
+        (global-set-key (kbd "C-c C-w C-r") 'warp-reload)
+        (global-set-key (kbd "C-c C-w C-c") 'warp-reload-change-url)
+        
+#### Usage
+
+Exec `M-x warp-reload` or `C-c C-w C-r` and input url you want to load on prompt.
+If you want to change url to load, exec `M-x warp-reload-change-url` or `C-c C-w C-c`.
