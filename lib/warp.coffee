@@ -49,7 +49,7 @@ header { #{ if @showHeader then "" else "display:none;" }
          height:1rem; position:fixed; width:100%;
          overflow:hidden; border-bottom:solid 1px #bbb; }
 header > ul > li { display: inline; margin: 1rem; }
-body { height:100%; width:100%; padding-top:1rem; }
+body { height:100%; width:100%; }
 iframe#warp-frame { height:100%; width:100%; border:0; #{ if @showHeader then "margin-top:1.2rem" else "" }}
 #closed-screen { display:none; height:100%; width:100%;
                  text-align: center; font-size: 3em; color: #fff;
