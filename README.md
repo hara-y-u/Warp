@@ -37,7 +37,7 @@ Warp provides Emacs with ability of realtime preview of html documents and docum
 
 4. Install `websocket` npm module.
 
-        $ cd warp
+        $ cd Warp
         $ npm install
 
     or, for grobal install, execute `npm install -g websocket`
