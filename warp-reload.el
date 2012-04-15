@@ -37,12 +37,18 @@
 (defvar warp-reload-mode-hook nil
   "Hook for warp-reload mode")
 
+(defvar warp-reload-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-w C-c") 'warp-reload-change-url)
+    map))
+
 ;;;###autoload
 (define-minor-mode warp-reload
   "Warp Reload minor mode"
   :lighter " Warp-R"
   :group  'warp
   :global t
+  :keymap warp-reload-map
   (if warp-reload
       (progn
         (warp-reload-start-server)

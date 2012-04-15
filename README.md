@@ -144,7 +144,7 @@ Exec `M-x customize-group RET warp` to see all customize options.
 - Client's display will chatter when resources are fetched from server not browser cache.
 
 
-## Extra
+## Extra Staff
 
 ### warp-reload.el
 
@@ -159,9 +159,8 @@ Put following lines to your ~/.emacs.d/init.el
         ;; (require 'warp) 
         (require 'warp-reload)
         (global-set-key (kbd "C-c C-w C-r") 'warp-reload)
-        (global-set-key (kbd "C-c C-w C-c") 'warp-reload-change-url)
         
 #### Usage
 
-Exec `M-x warp-reload` or `C-c C-w C-r` and input url you want to load on prompt.
-If you want to change url to load, exec `M-x warp-reload-change-url` or `C-c C-w C-c`.
+Exec `M-x warp-reload` or `C-c C-w C-r` and input url you want to reload on prompt.
+When you want to change url for reloading, exec `M-x warp-reload-change-url` or `C-c C-w C-c`.
