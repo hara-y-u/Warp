@@ -104,7 +104,7 @@
               'warp-reload-url-history
               nil
               )))
-    (push url warp-reload-url-history)
+    ;(push url warp-reload-url-history) ;no need to push manually
     (list (if (null (string-match "^\\(http://\\|file://\\)" url))
             (concat "http://" url)
           url))))
