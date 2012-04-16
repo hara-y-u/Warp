@@ -47,7 +47,7 @@ module.exports = class Warp
 * { margin:0; padding:0 }
 html {height:100%; overflow:hidden;}
 header { #{ if @showHeader then '' else 'display:none;' }
-         height:1rem; position:fixed; width:100%;
+         position:fixed; width:100%;
          overflow:hidden; border-bottom:solid 1px #bbb; }
 header > ul > li { display: inline; margin: 1rem; }
 body { height:100%; width:100%; }
