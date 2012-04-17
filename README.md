@@ -3,9 +3,6 @@
 
 # Warp
 
-<!-- Load remote. -->
-<!-- ![Warp](https://github.com/yukihr/Warp/raw/master/readme/warp.gif) -->
-
 Warp provides Emacs with ability of realtime preview of html documents and documents which can be converted to htmls.
 
 
@@ -22,6 +19,7 @@ Warp provides Emacs with ability of realtime preview of html documents and docum
 - Node.js 0.6.11, 0.7.2
 - Emacs 23.3
 - Latest Google Chrome, Mozilla Firefox
+- OSX 10.7, Ubuntu Linux 11.04
 
 
 ## Install
@@ -47,11 +45,13 @@ Warp provides Emacs with ability of realtime preview of html documents and docum
         (add-to-list 'load-path "/path/to/warp-directory")
         (require 'warp)
         (global-set-key (kbd "C-c C-w C-w") warp-mode) ;; Modify key bind as you want.
+
         ;; Set markdown converter (if you want)
         (add-to-list 'warp-format-converter-alist
                      '("\\.md\\|\\.markdown" t (lambda ()
                                                  ;; Set command you are using
                                                  '("markdown"))))
+
         ;; Below line is needed if you installed websocket npm module globally.
         (setenv "NODE_PATH" "/path/to/global/node_modules")
         ;; or, if you have setup NODE_PATH in the shell
@@ -156,7 +156,7 @@ Put following lines to your ~/.emacs.d/init.el
 
         ;; ;; if you haven't set up yet
         ;; (add-to-list 'load-path "/path/to/warp-directory")
-        ;; (require 'warp) 
+
         (require 'warp-reload)
         (global-set-key (kbd "C-c C-w C-r") 'warp-reload)
         
