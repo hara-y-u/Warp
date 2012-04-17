@@ -35,10 +35,10 @@ module.exports = class Warp
     <header>
       <ul>
         <li>Warp Client #<span id="client-id"></span></li>
-        <li>Load: <span id="loaded-url">Content</span></li>
+        <li>Load <span id="loaded-url">preview</span></li>
       </ul>
     </header>
-    <iframe id="warp-frame" src="/content.html"/>
+    <iframe id="warp-frame" name="warp-frame" src="/content.html"/>
   </body>
 </html>
 '''
@@ -86,7 +86,9 @@ startupStack.push(function() {
       case 'load':
       case 'url':
         frame.src = msg.data;
-        document.getElementById('loaded-url').innerHTML = '<a href=\"'+msg.data+'\" target=\"_blank\">' + msg.data + '</a>';
+        document.getElementById('loaded-url').innerHTML =
+          '<a href=\"'+msg.data+'\" target=\"warp-frame\">' + msg.data + '</a>'
+          + ' - <a href=\"'+msg.data+'\" target=\"_blank\">new tab</a>';
         break;
       case 'html':
         // // Remember Scroll Position
