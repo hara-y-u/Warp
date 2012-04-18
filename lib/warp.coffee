@@ -28,14 +28,25 @@ module.exports = class Warp
   <head>
     <title>Warp</title>
     <link rel="stylesheet" href="/client.css"/>
+    <script>
+      var $id = function() { return document.getElementById.apply(document, arguments); }
+      , $cls = function() { return document.getElementsByClassName.apply(document, arguments); }
+      , loadUrl = function() { $id(\'warp-frame\').src = $id(\'loaded-url\').value; }
+      , loadUrlOnNewTab = function() { window.open($id(\'loaded-url\').value,\'_blank\'); }
+      ;
+    </script>
     <script src="/client.js"></script>
   </head>
   <body>
     <div id="closed-screen">Server not running :(</div>
     <header>
       <ul>
-        <li>Warp Client #<span id="client-id"></span></li>
-        <li>Load <span id="loaded-url">preview</span></li>
+        <li>Warp Client #<span id="client-id"/></li>
+        <li>
+          <input type="text" id="loaded-url" value="/content.html" onchange="loadUrl()"/>
+          <a href="#" onclick="loadUrl()">load</a> /
+          <a href="#" onclick="loadUrlOnNewTab()">new tab</a>
+        </li>
       </ul>
     </header>
     <iframe id="warp-frame" name="warp-frame" src="/content.html"/>
@@ -44,14 +55,15 @@ module.exports = class Warp
 '''
 
   clientCss: () => """
-* { margin:0; padding:0 }
-html {height:100%; overflow:hidden;}
+* { margin:0; padding:0; }
+html { height:100%; overflow:hidden; }
 header { #{ if @showHeader then '' else 'display:none;' }
          position:fixed; width:100%;
          overflow:hidden; border-bottom:solid 1px #bbb; }
 header > ul > li { display: inline; margin: 1rem; }
+header > ul > li > input { width: 40%; }
 body { height:100%; width:100%; }
-iframe#warp-frame { height:100%; width:100%; border:0; #{ if @showHeader then 'margin-top:1.2rem' else '' }}
+iframe#warp-frame { height:100%; width:100%; border:0; #{ if @showHeader then 'margin-top:1.3rem' else '' }}
 #closed-screen { display:none; height:100%; width:100%;
                  text-align: center; font-size: 3em; color: #fff;
                  position:absolute; left:0; top:0;
@@ -86,9 +98,7 @@ startupStack.push(function() {
       case 'load':
       case 'url':
         frame.src = msg.data;
-        document.getElementById('loaded-url').innerHTML =
-          '<a href=\"'+msg.data+'\" target=\"warp-frame\">' + msg.data + '</a>'
-          + ' - <a href=\"'+msg.data+'\" target=\"_blank\">new tab</a>';
+        $id('loaded-url').value = msg.data;
         break;
       case 'html':
         // // Remember Scroll Position
@@ -114,7 +124,7 @@ startupStack.push(function() {
         frame.contentWindow.scrollTo(0, scrollTo);
         break;
       case 'client_id':
-        document.getElementById('client-id').innerText = msg.data;
+        $id('client-id').textContent = msg.data;
         break;
       default:
         soc.send(JSON.stringify({ type:'error', data:'unknown_type' }));
@@ -131,7 +141,7 @@ startupStack.push(nop);
 document.addEventListener('DOMContentLoaded', function() {
   // On Firefox, have to wait loading of iframe,
   // because doc will have reference to empty content before load.
-  frame = document.getElementById('warp-frame');
+  frame = $id('warp-frame');
   frame.onload = function() {
     startupStack.pop()();
     frame.onload = nop;
@@ -142,7 +152,7 @@ startupStack.pop()();
 
 soc.onclose = function() {
   if(#{@autoCloseClients}) { window.open('', '_self', ''); window.close(); }
-  document.getElementById('closed-screen').setAttribute('style', 'display:block;');
+  $id('closed-screen').setAttribute('style', 'display:block;');
 };
 
 }());

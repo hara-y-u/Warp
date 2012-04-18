@@ -28,6 +28,7 @@
 ;;; Todo:
 ;;;    * More customization.
 ;;;    * Display URL on mode line.
+;;;    * keybind to open client
 
 (require 'warp)
 
@@ -40,6 +41,7 @@
 (defvar warp-reload-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-w C-c") 'warp-reload-change-url)
+    (define-key map (kbd "C-c C-w C-o") 'warp-reload-open-client)
     map))
 
 ;;;###autoload
@@ -136,11 +138,11 @@
 (defun warp-reload-start-reloading-at-save ()
   (interactive)
   (progn (warp-reload-load-current-url)
-         (add-hook 'after-save-hook 'warp-reload-load-current-url)))
+         (add-hook 'after-save-hook 'warp-reload-request-reload)))
 
 (defun warp-reload-stop-reloading-at-save ()
   (interactive)
-  (remove-hook 'after-save-hook 'warp-reload-load-current-url))
-
+  (remove-hook 'after-save-hook 'warp-reload-request-reload))
 
 (provide 'warp-reload)
+;;; warp-reload.el ends here
