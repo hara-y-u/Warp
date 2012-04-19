@@ -144,7 +144,7 @@ Exec `M-x customize-group RET warp` to see all customize options.
 - Client's display will chatter when resources are fetched from server not browser cache.
 
 
-## Extra Staff
+## Extra Stuff
 
 ### warp-reload.el
 
