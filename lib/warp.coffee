@@ -313,7 +313,7 @@ soc.onclose = function() {
       if command[0] is "\x1B" # special command
         type = if (m = command.match /^\x1B(\S+)\x1D/) then m[1] else null
         data = if (m = command.match /\x1D([\w \S]+)/) then m[1] else null
-        if type is 'load' and type is 'url'
+        if type is 'load' or type is 'url'
           @lastCommand = type: type, data: data
         @sendWebSocketMessage type: type, data: data
       else # html command
