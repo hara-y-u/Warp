@@ -278,8 +278,9 @@ soc.onclose = function() {
         @sendWebSocketMessage
           type: 'client_id'
           data: id
-        if @lastCommand
-          @sendWebSocketMessage @lastCommand
+        switch @lastCommand.type
+          when 'load', 'url', 'html'
+            @sendWebSocketMessage @lastCommand
 
   sendWebSocketMessage: (msg, id) =>
     if id
@@ -312,7 +313,7 @@ soc.onclose = function() {
       if command[0] is "\x1B" # special command
         type = if (m = command.match /^\x1B(\S+)\x1D/) then m[1] else null
         data = if (m = command.match /\x1D([\w \S]+)/) then m[1] else null
-        if type is 'load' or 'url'
+        if type is 'load' and type is 'url'
           @lastCommand = type: type, data: data
         @sendWebSocketMessage type: type, data: data
       else # html command
