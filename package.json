@@ -1,12 +1,13 @@
 {
   "name": "Warp",
+  "version": "0.0.1",
   "description": "Warp!",
   "main": "lib/warp",
   "bin": "warp",
   "dependencies": {
-    "websocket": "~1.0.4"
+    "websocket": "1.0.4"
   },
   "engines": {
-    "node": ">=0.6.11"
+    "node": "0.6.11"
   }
 }
