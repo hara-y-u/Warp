@@ -1,4 +1,4 @@
-;;;warp-reload.el --- Reload Utility of Web Documents Realtime Preview Minor Mode
+;;;warp-reload.el --- Reload Utility of Warp
 ;; -*- Mode: Emacs-Lisp -*-
 
 ;; Copyright (C) 2012 by yukihiro hara
@@ -28,7 +28,6 @@
 ;;; Todo:
 ;;;    * More customization.
 ;;;    * Display URL on mode line.
-;;;    * keybind to open client
 
 (require 'warp)
 
@@ -93,11 +92,6 @@
   (interactive)
   (warp-open-client-at-port warp-reload-server-port))
 
-;; (defun warp-reload-load-url-of-buffer (buffer)
-;;   "Load URL of current buffer in warp client. Open new client, if needed."
-;;   (interactive "bBuffer to Warp: ")
-;;   (warp-reload-load-url (concat "file://" (buffer-file-name))))
-
 (defvar warp-reload-url-history '()
   "URL history.")
 
@@ -112,7 +106,6 @@
               'warp-reload-url-history
               nil
               )))
-    ;(push url warp-reload-url-history) ;no need to push manually
     (list (if (null (string-match "^\\(http://\\|file://\\)" url))
             (concat "http://" url)
           url))))
@@ -145,4 +138,4 @@
   (remove-hook 'after-save-hook 'warp-reload-request-reload))
 
 (provide 'warp-reload)
-;;; warp-reload.el ends here
+;;;warp-reload.el ends here
