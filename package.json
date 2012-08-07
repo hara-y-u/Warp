@@ -1,6 +1,6 @@
 {
   "name": "Warp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Warp!",
   "main": "lib/warp",
   "bin": "warp",
