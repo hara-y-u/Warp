@@ -118,6 +118,12 @@ Exec `M-x customize-group RET warp` to see all customize options.
          '(warp-auto-start-auto-scroll nil))
          
 - Set custom converter.
+                                                 
+    - Use Major Mode symbol
+
+            (add-to-list 'warp-format-converter-alist
+                         '(markdown-mode t (lambda ()
+                                                     '("markdown"))))
 
     - [textile](http://redcloth.org/textile)
 
