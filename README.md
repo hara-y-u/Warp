@@ -170,3 +170,8 @@ Put following lines to your ~/.emacs.d/init.el
 
 Exec `M-x warp-reload` or `C-c C-w C-r` and input url you want to reload on prompt.
 When you want to change url for reloading, exec `M-x warp-reload-change-url` or `C-c C-w C-c`.
+
+## History
+
+- 0.0.2 Availability for Setting Converters with Major Mode Symbol
+- 0.0.1 Initial Version
