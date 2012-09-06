@@ -1,5 +1,4 @@
-;;;warp.el --- Web Documents Realtime Preview Minor Mode
-;; -*- Mode: Emacs-Lisp -*-
+;;; warp.el --- Web Documents Realtime Preview Minor Mode
 
 ;; Copyright (C) 2012 by yukihiro hara
 
@@ -512,4 +511,4 @@ Be sure to get port number by `warp-get-server-port'.")
 ;;;;;;;;; Provide ;;;;;;;;;
 (provide 'warp)
 
-;;;warp.el ends here
+;;; warp.el ends here
