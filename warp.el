@@ -84,16 +84,17 @@
 (defcustom warp-format-converter-alist '()
   "Alist of converters used for converting specific format to html. The format is:
 
-'\(\(\"Filename or Regexp\" \"Need STDIN Input\" \"Function which returns convert command in list format\"\)..\)
+'\(\(\"Filename or Regexp or Major Mode Symbol\" \"Need STDIN Input\" \"Function which returns convert command in list format\"\)..\)
 
 e.g.) Setting for Markdown
 \(add-to-list 'warp-format-converter-alist
  '(\"\\.md\\|\\.markdown\" t (lambda ()
                             '(\"markdown\"))))
 
-If `warp-mode' is enabled on buffer its file name matches \"Filename or Regexp\",
+If `warp-mode' is enabled on buffer its file name matches \"Filename or Regexp\"
+or its major-mode equals \"Major Mode Symbol\",
 `warp-mode' converts buffer string to HTML using converter command returned by
-associated function before send string to server. If \"Need STDIN Input\" is not nil,
+associated function before sending string to server. If \"Need STDIN Input\" is not nil,
 send current buffer string to command's STDIN."
   :type 'list
   :group 'warp)
