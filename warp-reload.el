@@ -1,5 +1,5 @@
-;;;warp-reload.el --- Reload Utility of Warp
-;; -*- Mode: Emacs-Lisp -*-
+;;; warp-reload.el --- Reload Utility for Warp
+;; -*- mode: emacs-lisp -*-
 
 ;; Copyright (C) 2012 by yukihiro hara
 
@@ -26,7 +26,7 @@
 ;;; Commentary:
 ;;; Commands:
 ;;; Todo:
-;;;    * More customization.
+;;;    * More customization availability.
 ;;;    * Display URL on mode line.
 
 (require 'warp)
@@ -138,4 +138,4 @@
   (remove-hook 'after-save-hook 'warp-reload-request-reload))
 
 (provide 'warp-reload)
-;;;warp-reload.el ends here
+;;; warp-reload.el ends here
