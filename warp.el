@@ -373,29 +373,6 @@ Be sure to get port number by `warp-get-server-port'.")
         (setq html-message (buffer-string)))
       (warp-send-command html-message))))
 
-;;;; Async version (won't work well)
-;; (defun warp-send-current-buffer-converting ()
-;;   "Send warp server current buffer content converting to HTML data."
-;;   (interactive)
-;;   (progn (warp-send-server-string "")
-;;          (let* ((convert-command
-;;                  (funcall (car (assoc-default buffer-file-name
-;;                                               warp-format-converter-alist 'string-match))))
-;;                 (convert-process
-;;                  (apply 'start-process "warp-convert" (current-buffer) convert-command)))
-;;            (set-process-query-on-exit-flag convert-process nil)
-;;            (set-process-filter convert-process
-;;                                '(lambda (process output)
-;;                                   (warp-send-server-string output)))
-;;            (set-process-sentinel convert-process
-;;                                  '(lambda (process event)
-;;                                     (when (equal (process-status process) 'exit)
-;;                                       (warp-send-server-string ""))))
-;;            ;; TODO: IF command need stdin
-;;            (process-send-string convert-process (concat (warp-buffer-string) "\n"))
-;;            (process-send-eof convert-process))
-;;          ))
-
 (defun warp-current-buffer-need-convert-p ()
   "See if conversion is needed for current buffer. TODO: Refactor, this function is not needed"
   (not (null (warp-get-converter-settings-for-current-buffer))))
