@@ -20,15 +20,23 @@
 (require 'warp-client)
 (eval-when-compile (require 'cl))
 
+;; Server Mock
 (defstruct warp-server
   port)
 
+(defvar warp-server (make-warp-server
+                     :port 9998))
+
+(defvar warp-client (make-warp-client
+                     :server warp-server))
+
 (ert-deftest warp-client-url ()
-  (let* ((warp-server (make-warp-server
-                       :port 9998))
-         (warp-client (make-warp-client
-                      :server warp-server)))
-    (should
-     (string-match "^file://.+\?wsport=[[:digit:]]+"
-                   (warp-client-url warp-client)))))
+  (should
+   (string-match "^file://.+\?wsport=[[:digit:]]+"
+                 (warp-client-url warp-client))))
+
+(ert-deftest warp-client-open ()
+  (warp-client-open warp-client)
+  (should
+   (y-or-n-p "Client opened in browser correctly?")))
 
