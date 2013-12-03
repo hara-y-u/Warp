@@ -31,7 +31,7 @@
   (browse-url (warp-client-url client)))
 
 (defun warp-client-url (client)
-   (concat
+  (concat
     "file://"
     (warp-client-path client)
     "?wsport="
