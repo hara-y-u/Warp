@@ -1,0 +1,15 @@
+* { margin:0; padding:0; }
+html { height:100%; overflow:hidden; }
+header { #{ if @showHeader then '' else 'display:none;' }
+         position:fixed; width:100%;
+         overflow:hidden; border-bottom:solid 1px #bbb; }
+header > ul > li { display: inline; margin: 1rem; }
+header > ul > li > input { width: 40%; }
+body { height:100%; width:100%; }
+iframe#warp-frame { height:100%; width:100%; border:0; #{ if @showHeader then 'margin-top:1.3rem' else '' }}
+#closed-screen { display:none; height:100%; width:100%;
+                 text-align: center; font-size: 3em; color: #fff;
+                 position:absolute; left:0; top:0;
+                 background-color:rgba(0,0,0,0.8); z-index: 99999;
+                 padding-top: 2em;
+                }

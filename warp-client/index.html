@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>warp</title>
+    <link rel="stylesheet" href="./client.css"/>
+    <script src="./client.js"></script>
+  </head>
+  <body>
+    <div id="closed-screen">Server not running :(</div>
+    <header>
+      <ul>
+        <li>warp client #<span id="client-id"/></li>
+        <!-- <li> -->
+        <!--   <input type="text" id="loaded-url" value="/content.html" onchange="loadUrl()"/> -->
+        <!--   <a id="link-load" href="#" onclick="loadUrl()">load</a> / -->
+        <!--   <a id="link-newtab" href="#" onclick="loadUrlOnNewTab()">new tab</a> -->
+        <!-- </li> -->
+      </ul>
+    </header>
+    <iframe id="warp-frame" name="warp-frame" src="./content.html"/>
+  </body>
+</html>

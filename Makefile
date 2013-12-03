@@ -1,5 +1,5 @@
-lib/warp.js: lib/warp.coffee
-	coffee -c lib/warp.coffee
+lib/warp.js: warp-client/client.coffee
+	coffee -c warp-client/client.coffee
 
 clean:
-	rm -f lib/warp.js
+	rm -f warp-client/client.js
