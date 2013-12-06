@@ -28,21 +28,16 @@
 (defstruct (warp-client-server
             (:constructor nil)
             (:constructor warp-client-server--inner-make))
-  (root-directory default-directory)
   (port 8800)
   (host "localhost")
   ; only for inner use
-  (assets-directory
-   (expand-file-name
-    "warp-client"
-    (file-name-directory (or load-file-name "."))))
   warp-ws-server
   web-server-proc
   )
 
 
 ;;; Constructor
-  
+
 (defun make-warp-client-server (&rest options)
   "Make warp-client-server instance and start serving process.
 This function takes optional values for warp-client-server:
@@ -83,6 +78,8 @@ This function takes optional values for warp-client-server:
 ;;; Properties
 
 (defun warp-client-server-url (client-server)
+  (princ (format "!ws-server %S" (warp-client-server-warp-ws-server
+                  client-server)))
   (let ((host (warp-client-server-host client-server))
         (port (warp-client-server-port client-server))
         (wsport (warp-ws-server-port
@@ -93,16 +90,38 @@ This function takes optional values for warp-client-server:
 
 ;;; Methods (double hyphen means private)
 
+(defvar warp-client-server--root-directory "~/public_html")
+(make-variable-buffer-local 'warp-client-server-root-directory)
+
+(defvar warp-client-server--static-handler nil)
+(make-variable-buffer-local 'warp-client-server--static-handler)
+  
 (defun warp-client-server--start-web-server (client-server)
   "Start web server for client-server and return its process"
+  (setq warp-client-server--root-directory default-directory)
+  (setq warp-client-server--static-handler
+        (elnode-webserver-handler-maker warp-client-server-root-directory))
   (cdar (elnode-start
          'warp-client-server--web-server-handler
          :port (warp-client-server-port client-server)
          :host (warp-client-server-host client-server))))
 
+(defvar warp-client-server--assets-directory
+  (expand-file-name
+   "warp-client"
+   (file-name-directory (or load-file-name "."))))
+
+(defvar warp-client-server--assets
+  '("index.html" "client.js" "client.css" "content.html"))
+
 (defun warp-client-server--web-server-handler (httpcon)
-  (elnode-http-start httpcon 200 '("Content-type" . "text/html"))
-  (elnode-http-return httpcon "<html><b>HELLO!</b></html>"))
+  (let* ((path (elnode-http-pathinfo httpcon))
+         (fragment (substring path 1)))
+    (elnode-http-start httpcon 200 '("Content-type" . "text/html"))
+    (when (equal path "/") (setq fragment "index.html"))
+    (if (member fragment warp-client-server--assets)
+        (warp-client-server--serve-assets httpcon fragment)
+      (warp-client-server--serve-files httpcon))))
 
 (defun warp-client-server--stop-web-server (client-server)
   "Stop web server for client-server.
@@ -113,6 +132,13 @@ This function returns process object if succeed, else return nil"
         nil
       (cdar ret))))
 
+(defun warp-client-server--serve-assets (httpcon filename)
+  (let ((path (expand-file-name filename
+                                warp-client-server--assets-directory)))
+        (elnode-http-return httpcon (warp-util-read-file path))))
+
+(defun warp-client-server--serve-files (httpcon)
+  (warp-client-server--static-handler httpcon))
 
 (provide 'warp-client-server)
 
