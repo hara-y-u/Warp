@@ -16,28 +16,9 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-(require 'warp-server)
-(eval-when-compile (require 'cl))
+(require 'warp-client-server)
 
-(defstruct warp-client
-  (path (expand-file-name
-         "warp-client/index.html"
-         (file-name-directory
-          (or load-file-name "."))))
-  server
-  )
-
-(defun warp-client-open (client)
-  (browse-url (warp-client-url client)))
-
-(defun warp-client-url (client)
-  (concat
-    "file://"
-    (warp-client-path client)
-    "?wsport="
-    (number-to-string (warp-server-port
-                       (warp-client-server client)))))
+(defun warp-client-open (client-server)
+  (browse-url (warp-client-server-url client-server)))
 
 (provide 'warp-client)
-
-;;; warp-client.el ends here

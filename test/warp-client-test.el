@@ -17,26 +17,26 @@
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 (require 'ert)
+(require 'warp-client-server)
 (require 'warp-client)
 (eval-when-compile (require 'cl))
 
-;; Server Mock
-(defstruct warp-server
+
+;;; Server Mock
+
+(defstruct warp-ws-server
   port)
 
-(defvar warp-server (make-warp-server
+(defvar warp-ws-server (make-warp-server
                      :port 9998))
 
 (defvar warp-client-server (make-warp-client-server
-                     :server warp-server))
+                     :warp-ws-server warp-ws-server))
 
-(ert-deftest warp-client-url ()
-  (should
-   (string-match "^file://.+\?wsport=[[:digit:]]+"
-                 (warp-client-url warp-client))))
+
+;;; Tests
 
 (ert-deftest warp-client-open ()
-  (warp-client-open warp-client)
+  (warp-client-open warp-client-server)
   (should
    (y-or-n-p "Client opened in browser correctly?")))
-
