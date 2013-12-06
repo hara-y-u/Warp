@@ -27,7 +27,7 @@
 (defvar warp-server (make-warp-server
                      :port 9998))
 
-(defvar warp-client (make-warp-client
+(defvar warp-client-server (make-warp-client-server
                      :server warp-server))
 
 (ert-deftest warp-client-url ()

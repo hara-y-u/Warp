@@ -1,4 +1,4 @@
-;;; warp-server.el --- warp server
+;;; warp-ws-server.el --- warp server
 
 ;; Copyright (c) 2013  Free Software Foundation, Inc.
 
@@ -16,16 +16,17 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
+(eval-when-compile (require 'cl))
 (require 'websocket)
 ;(require 'warp-converter)
-(eval-when-compile (require 'cl))
 
-(defstruct warp-server
+(defstruct warp-ws-server
   port
   websocket-server
-  clients
+  client-server ; necessary?
+  (sockets nil)
   )
 
-(provide 'warp-server)
+(provide 'warp-ws-server)
 
-;;; warp-server.el ends here
+;;; warp-ws-server.el ends here
