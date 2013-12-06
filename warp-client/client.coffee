@@ -75,13 +75,16 @@ dfd
         frame.onload = (->)
   .then ->
     socket.onmessage = (message)->
-      switch(message.type)
-        when 'command'
-          handleCommand message, frame
-        when 'notify'
-          handleNotify message
-        else
-          console.error "Unknown type \"#{message.type}\" on message: #{message}"
+      console.log(message)
+      if message.type is "message"
+        data = JSON.parse(message.data)
+        switch(data.type)
+          when 'command'
+            handleCommand data, frame
+          when 'notify'
+            handleNotify data 
+          else
+            console.error "Unknown type \"#{data.type}\" on message.data: #{data}"
     socket.send new WarpMessage(
       type: 'notify'
       name: 'start'
@@ -129,5 +132,7 @@ handleNotify = (notify) ->
       $id("client-id").textContent = notify.data
     when "test"
       false
+    when "start"
+      console.log "Server Accepted Client!"
     else
       console.error "Unknown notify \"#{notify.name}\" on notify: #{notify}"
