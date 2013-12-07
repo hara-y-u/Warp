@@ -16,6 +16,8 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
+;; TODO: Test will affect another unit test
+
 (eval-when-compile (require 'cl))
 (require 'ert)
 (require 'warp-client-server)
@@ -28,10 +30,10 @@
 
 ;;; Variables
 
-(defvar warp-ws-server (make-warp-ws-server
+(setq warp-ws-server (make-warp-ws-server
                      :port 9998))
 
-(defvar test-port 8803)
+(setq test-port 8803)
 
 
 ;;; Helpers
@@ -77,3 +79,5 @@
       (elnode-stop test-port)))
     (purge-web-server)
     ))
+
+;; TODO: tests for handlers

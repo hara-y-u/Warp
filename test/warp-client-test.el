@@ -16,22 +16,32 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-(require 'ert)
-(require 'warp-client-server)
-(require 'warp-client)
+;; TODO: Test will affect another unit test
+
 (eval-when-compile (require 'cl))
+(require 'ert)
+(require 'warp-client)
 
 
-;;; Server Mock
+;;; Mock
 
 (defstruct warp-ws-server
   port)
 
-(defvar warp-ws-server (make-warp-ws-server
-                     :port 9998))
+(defstruct warp-client-server
+  host
+  port
+  warp-ws-server)
 
-(defvar warp-client-server (make-warp-client-server
-                            :warp-ws-server warp-ws-server))
+(setq test-port 8802)
+
+(setq warp-ws-server (make-warp-ws-server
+                      :port 9998))
+
+(setq warp-client-server (make-warp-client-server
+                          :host "localhost"
+                          :port test-port
+                          :warp-ws-server warp-ws-server))
 
 ;;; Helpers
 
@@ -43,5 +53,6 @@
 (ert-deftest warp-client-open ()
   (warp-client-open warp-client-server)
   (should
-   (y-or-n-p "Client opened in browser correctly?"))
-  (purge-web-server))
+   (y-or-n-p "Client url opened in browser correctly?"))
+  (purge-web-server)
+  )
