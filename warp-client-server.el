@@ -28,11 +28,11 @@
 (defstruct (warp-client-server
             (:constructor nil)
             (:constructor warp-client-server--inner-make))
+  (root-directory "~/public_html") ; TODO
   (port 8800)
   (host "localhost")
   ; only for inner use
   warp-ws-server
-  web-server-proc
   )
 
 
@@ -41,6 +41,7 @@
 (defun make-warp-client-server (&rest options)
   "Make warp-client-server instance and start serving process.
 This function takes optional values for warp-client-server:
+
   root-directory: root directory for serve files
   port: port number for inner webserver
   host: host name for inner webserver
@@ -55,13 +56,7 @@ Returns web-server-proc if succeeded, else returns nil.
         (progn
           (message "warp: faild to start web server for client")
           nil)
-      (progn
-        (process-put web-server-proc
-                     :warp-client-server
-                     client-server)
-        (setf (warp-client-server-web-server-proc client-server)
-              web-server-proc)
-        client-server))))
+      client-server)))
 
 
 ;;; Destructor
@@ -90,6 +85,7 @@ Returns web-server-proc if succeeded, else returns nil.
 
 ;;; Methods (double hyphen means private)
 
+;; TODO: Move this var to property, and set from consumer
 (defvar warp-client-server--root-directory "~/public_html")
 (make-variable-buffer-local 'warp-client-server--root-directory)
 
@@ -109,7 +105,7 @@ Returns web-server-proc if succeeded, else returns nil.
 
 (defun warp-client-server--start-web-server (client-server)
   "Start web server for client-server and return its process"
-  (setq warp-client-server--root-directory default-directory)
+  (setq warp-client-server--root-directory default-directory) ; TODO: don't access buffer local var (default-directory)
   (fset 'warp-client-server--static-handler
         (elnode-webserver-handler-maker warp-client-server--root-directory))
   (fset 'warp-client-server--assets-handler
