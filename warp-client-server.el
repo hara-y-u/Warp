@@ -16,6 +16,8 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
+;; TODO: rename to warp-web-server
+
 (eval-when-compile (require 'cl))
 (require 'warp-util)
 (require 'warp-ws-server)
@@ -66,10 +68,9 @@ Returns web-server-proc if succeeded, else returns nil.
   (let ((ret ;; process if success, otherwise nil
          (warp-client-server--stop-web-server client-server)))
     (if (null ret)
-        (message "warp: failed to stop web-server for client.")
-      (progn (setf (warp-client-server-web-server-proc client-server)
-                   nil)
-             ret))))
+        (progn (message "warp: failed to stop web-server for client.")
+               nil)
+      ret)))
 
 
 ;;; Properties
