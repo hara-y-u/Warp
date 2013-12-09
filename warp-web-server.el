@@ -1,4 +1,4 @@
-;;; warp-client-server.el --- warp server for client html
+;;; warp-web-server.el --- warp server for client html
 
 ;; Copyright (c) 2013  Free Software Foundation, Inc.
 
@@ -27,9 +27,9 @@
 
 ;;; Main Struct
 
-(defstruct (warp-client-server
+(defstruct (warp-web-server
             (:constructor nil)
-            (:constructor warp-client-server--inner-make))
+            (:constructor warp-web-server--inner-make))
   (root-directory "~/public_html") ; TODO
   (port 8800)
   (host "localhost")
@@ -40,9 +40,9 @@
 
 ;;; Constructor
 
-(defun make-warp-client-server (&rest options)
-  "Make warp-client-server instance and start serving process.
-This function takes optional values for warp-client-server:
+(defun make-warp-web-server (&rest options)
+  "Make warp-web-server instance and start serving process.
+This function takes optional values for warp-web-server:
 
   root-directory: root directory for serve files
   port: port number for inner webserver
@@ -50,23 +50,23 @@ This function takes optional values for warp-client-server:
 
 Returns web-server-proc if succeeded, else returns nil.
 "
-  (let* ((client-server
-          (apply 'warp-client-server--inner-make options))
+  (let* ((web-server
+          (apply 'warp-web-server--inner-make options))
          (web-server-proc
-          (warp-client-server--start-web-server client-server)))
+          (warp-web-server--start-server-proc web-server)))
     (if (null web-server-proc)
         (progn
           (message "warp: faild to start web server for client")
           nil)
-      client-server)))
+      web-server)))
 
 
 ;;; Destructor
   
-(defun delete-warp-client-server (client-server)
-  "Delete warp-client-server instance"
+(defun delete-warp-web-server (web-server)
+  "Delete warp-web-server instance"
   (let ((ret ;; process if success, otherwise nil
-         (warp-client-server--stop-web-server client-server)))
+         (warp-web-server--stop-server-proc web-server)))
     (if (null ret)
         (progn (message "warp: failed to stop web-server for client.")
                nil)
@@ -75,64 +75,64 @@ Returns web-server-proc if succeeded, else returns nil.
 
 ;;; Properties
 
-(defun warp-client-server-url (client-server)
-  (let ((host (warp-client-server-host client-server))
-        (port (warp-client-server-port client-server))
+(defun warp-web-server-url (web-server)
+  (let ((host (warp-web-server-host web-server))
+        (port (warp-web-server-port web-server))
         (wsport (warp-ws-server-port
-                 (warp-client-server-warp-ws-server
-                  client-server))))
+                 (warp-web-server-warp-ws-server
+                  web-server))))
     (format "http://%s:%d?wsport=%d" host port wsport)))
 
 
 ;;; Methods (double hyphen means private)
 
 ;; TODO: Move this var to property, and set from consumer
-(defvar warp-client-server--root-directory "~/public_html")
-(make-variable-buffer-local 'warp-client-server--root-directory)
+(defvar warp-web-server--root-directory "~/public_html")
+(make-variable-buffer-local 'warp-web-server--root-directory)
 
-(defvar warp-client-server--static-handler nil)
-(make-variable-buffer-local 'warp-client-server--static-handler)
+(defvar warp-web-server--static-handler nil)
+(make-variable-buffer-local 'warp-web-server--static-handler)
   
-(defvar warp-client-server--assets-directory
+(defvar warp-web-server--assets-directory
   (expand-file-name
    "warp-client"
    (file-name-directory (or load-file-name "."))))
 
-(defvar warp-client-server--assets
+(defvar warp-web-server--assets
   ;; TODO: concat assets into index.html
   '("index.html" "client.js" "client.css" "content.html"))
 
-(defvar warp-client-server--assets-handler nil)
+(defvar warp-web-server--assets-handler nil)
 
-(defun warp-client-server--start-web-server (client-server)
-  "Start web server for client-server and return its process"
-  (setq warp-client-server--root-directory default-directory) ; TODO: don't access buffer local var (default-directory)
-  (fset 'warp-client-server--static-handler
-        (elnode-webserver-handler-maker warp-client-server--root-directory))
-  (fset 'warp-client-server--assets-handler
-        (elnode-webserver-handler-maker warp-client-server--assets-directory))
+(defun warp-web-server--start-server-proc (web-server)
+  "Start web server process for web-server and return its process"
+  (setq warp-web-server--root-directory default-directory) ; TODO: don't access buffer local var (default-directory)
+  (fset 'warp-web-server--static-handler
+        (elnode-webserver-handler-maker warp-web-server--root-directory))
+  (fset 'warp-web-server--assets-handler
+        (elnode-webserver-handler-maker warp-web-server--assets-directory))
   (cdar (elnode-start
-         'warp-client-server--web-server-handler
-         :port (warp-client-server-port client-server)
-         :host (warp-client-server-host client-server))))
+         'warp-web-server--handler
+         :port (warp-web-server-port web-server)
+         :host (warp-web-server-host web-server))))
 
-(defun warp-client-server--web-server-handler (httpcon)
+(defun warp-web-server--handler (httpcon)
   (let* ((path (elnode-http-pathinfo httpcon))
          (fragment (substring path 1)))
     (when (equal path "/") (setq fragment "index.html"))
-    (if (member fragment warp-client-server--assets)
-        (funcall 'warp-client-server--assets-handler httpcon)
-      (funcall 'warp-client-server--static-handler httpcon))))
+    (if (member fragment warp-web-server--assets)
+        (funcall 'warp-web-server--assets-handler httpcon)
+      (funcall 'warp-web-server--static-handler httpcon))))
 
-(defun warp-client-server--stop-web-server (client-server)
-  "Stop web server for client-server.
+(defun warp-web-server--stop-server-proc (web-server)
+  "Stop web server proc for web-server.
 This function returns process object if succeed, else return nil"
   (let ((ret (elnode-stop
-              (warp-client-server-port client-server))))
+              (warp-web-server-port web-server))))
     (if (null ret)
         nil
       (cdar ret))))
 
-(provide 'warp-client-server)
+(provide 'warp-web-server)
 
-;;; warp-client-server.el ends here
+;;; warp-web-server.el ends here

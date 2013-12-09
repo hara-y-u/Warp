@@ -1,4 +1,4 @@
-;;; warp-client-server-test.el --- Unit tests for warp-client-server
+;;; warp-web-server-test.el --- Unit tests for warp-web-server
 
 ;; Copyright (c) 2013  Free Software Foundation, Inc.
 
@@ -20,7 +20,7 @@
 
 (eval-when-compile (require 'cl))
 (require 'ert)
-(require 'warp-client-server)
+(require 'warp-web-server)
 
 ;;; Server Mock
 
@@ -44,35 +44,35 @@
 
 ;;; Tests
 
-(ert-deftest make-warp-client-server ()
-  (let ((client-server (make-warp-client-server
+(ert-deftest make-warp-web-server ()
+  (let ((web-server (make-warp-web-server
                         :port test-port
                         :warp-ws-server warp-ws-server)))
     (should
      (eq test-port
-         (warp-client-server-port client-server)))
+         (warp-web-server-port web-server)))
     (should
      (equal "localhost"
-         (warp-client-server-host client-server)))
+         (warp-web-server-host web-server)))
     (purge-web-server)
     ))
 
-(ert-deftest warp-client-server-url ()
-  (let ((client-server (make-warp-client-server
+(ert-deftest warp-web-server-url ()
+  (let ((web-server (make-warp-web-server
                         :port test-port
                         :warp-ws-server warp-ws-server)))
     (should
      (string-match "^http://localhost:[[:digit:]]+\\?wsport=[[:digit:]]+"
-                   (warp-client-server-url client-server)))
+                   (warp-web-server-url web-server)))
     (purge-web-server)
     ))
 
-(ert-deftest delete-warp-client-server ()
-  (let ((client-server (make-warp-client-server
+(ert-deftest delete-warp-web-server ()
+  (let ((web-server (make-warp-web-server
                         :port test-port
                         :warp-ws-server warp-ws-server)))
     (sleep-for 0.5)
-    (delete-warp-client-server client-server)
+    (delete-warp-web-server web-server)
     (sleep-for 0.5)
     (should
      (null
