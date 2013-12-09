@@ -1,6 +1,8 @@
 <!-- Local CSS From: https://github.com/clownfart/Markdown-CSS -->
 <link href="readme/markdown.css" rel="stylesheet"></link>
 
+**[WIP] This Branch is for Pure Elisp Implementation of Warp, work in progress**
+
 # Warp
 
 Warp provides Emacs with ability of realtime preview of html documents and documents which can be converted to htmls.
