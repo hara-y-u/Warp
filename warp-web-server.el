@@ -16,8 +16,6 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-;; TODO: rename to warp-web-server
-
 (eval-when-compile (require 'cl))
 (require 'warp-util)
 (require 'warp-ws-server)
@@ -30,7 +28,7 @@
 (defstruct (warp-web-server
             (:constructor nil)
             (:constructor warp-web-server--inner-make))
-  (root-directory "~/public_html") ; TODO
+  (root-directory "~/public_html")
   (port 8800)
   (host "localhost")
   ; only for inner use
@@ -86,10 +84,6 @@ Returns web-server-proc if succeeded, else returns nil.
 
 ;;; Methods (double hyphen means private)
 
-;; TODO: Move this var to property, and set from consumer
-(defvar warp-web-server--root-directory "~/public_html")
-(make-variable-buffer-local 'warp-web-server--root-directory)
-
 (defvar warp-web-server--static-handler nil)
 (make-variable-buffer-local 'warp-web-server--static-handler)
   
@@ -106,9 +100,9 @@ Returns web-server-proc if succeeded, else returns nil.
 
 (defun warp-web-server--start-server-proc (web-server)
   "Start web server process for web-server and return its process"
-  (setq warp-web-server--root-directory default-directory) ; TODO: don't access buffer local var (default-directory)
   (fset 'warp-web-server--static-handler
-        (elnode-webserver-handler-maker warp-web-server--root-directory))
+        (elnode-webserver-handler-maker
+         (warp-web-server-root-directory web-server)))
   (fset 'warp-web-server--assets-handler
         (elnode-webserver-handler-maker warp-web-server--assets-directory))
   (cdar (elnode-start
