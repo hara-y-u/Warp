@@ -75,7 +75,7 @@ Returns web-server-proc if succeeded, else returns nil.
 
 ;;; Properties
 
-(defun warp-web-server-url (web-server)
+(defun warp-web-server-client-url (web-server)
   (let ((host (warp-web-server-host web-server))
         (port (warp-web-server-port web-server))
         (wsport (warp-ws-server-port
@@ -133,6 +133,9 @@ This function returns process object if succeed, else return nil"
         nil
       (cdar ret))))
 
+;; TODO: If client gets large spec, cut this out to warp-client object.
+(defun warp-web-server-open-client (web-server)
+  (browse-url (warp-web-server-client-url web-server)))
 (provide 'warp-web-server)
 
 ;;; warp-web-server.el ends here

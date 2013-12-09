@@ -80,4 +80,14 @@
     (purge-web-server)
     ))
 
+(ert-deftest warp-web-server-open-client ()
+  (let ((web-server (make-warp-web-server
+                        :port test-port
+                        :warp-ws-server warp-ws-server)))
+    (warp-web-server-open-client web-server)
+    (should
+     (y-or-n-p "Client url opened in browser correctly?"))
+    (purge-web-server)
+    ))
+
 ;; TODO: tests for handlers
