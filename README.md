@@ -175,3 +175,11 @@ When you want to change url for reloading, exec `M-x warp-reload-change-url` or 
 
 - 0.0.2 Availability for Setting Converters with Major Mode Symbol
 - 0.0.1 Initial Version
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
