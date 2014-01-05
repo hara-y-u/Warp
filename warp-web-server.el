@@ -60,7 +60,7 @@ Returns web-server-proc if succeeded, else returns nil.
 
 
 ;;; Destructor
-  
+
 (defun delete-warp-web-server (web-server)
   "Delete warp-web-server instance"
   (let ((ret ;; process if success, otherwise nil
@@ -86,7 +86,7 @@ Returns web-server-proc if succeeded, else returns nil.
 
 (defvar warp-web-server--static-handler nil)
 (make-variable-buffer-local 'warp-web-server--static-handler)
-  
+
 (defvar warp-web-server--assets-directory
   (expand-file-name
    "warp-client"
