@@ -46,7 +46,7 @@ This function takes optional values for warp-web-server:
   port: port number for inner webserver
   host: host name for inner webserver
 
-Returns web-server-proc if succeeded, else returns nil.
+Returns warp-web-server if succeeded, else returns nil.
 "
   (let* ((web-server
           (apply 'warp-web-server--inner-make options))
