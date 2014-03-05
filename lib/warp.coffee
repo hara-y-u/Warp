@@ -103,8 +103,21 @@ startupStack.push(function() {
       case 'html':
         // // Remember Scroll Position
         // scrollTo = doc.documentElement.scrollTop || doc.body.scrollTop;
-        doc.documentElement.innerHTML = msg.data;
-        document.title = frame.contentDocument.title;
+        var docElm = doc.documentElement;
+        docElm.innerHTML = msg.data;
+        var elm = docElm.getElementsByTagName('script');
+        var body = docElm.getElementsByTagName('body');
+        var src=[];
+          for (var i = 0; i < elm.length; i++) {
+            src[i] = elm[i].getAttribute('src');
+          //elm[i].parentNode.removeChild(elm[i]);
+        }
+        for (var i = 0; i < src.length; i++) {
+          var script = doc.createElement('script');
+          script.setAttribute('src', src[i]);
+          body[0].appendChild(script);
+        }
+        setTimeout(function(){document.title = frame.contentDocument.title;}, 100);
         // frame.contentWindow.scrollTo(0, scrollTo);
         break;
       case 'scroll':
