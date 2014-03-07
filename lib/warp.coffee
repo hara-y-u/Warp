@@ -206,7 +206,7 @@ soc.onclose = function() {
         @sendStaticFiles req, res
 
   sendStaticFiles: (req, res) =>
-    p = path.join process.cwd(), url.parse(req.url).path
+    p = path.join process.cwd(), decodeURI url.parse(req.url).path
     ext = path.extname p
 
     _exists = fs.exists or path.exists
