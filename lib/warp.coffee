@@ -89,6 +89,8 @@ startupStack.push(function() {
   doc = frame.contentDocument;
 
   soc.onmessage = function(msg) {
+    var docElm, elm, body, originalScripts, script, src, i, len
+    ;
     msg = JSON.parse(msg.data);
     #{ if @enableClientLog then 'console.log(msg.type, msg.data);' else '' }
     switch (msg.type) {
@@ -101,11 +103,28 @@ startupStack.push(function() {
         $id('loaded-url').value = msg.data;
         break;
       case 'html':
-        // // Remember Scroll Position
-        // scrollTo = doc.documentElement.scrollTop || doc.body.scrollTop;
-        doc.documentElement.innerHTML = msg.data;
-        document.title = frame.contentDocument.title;
-        // frame.contentWindow.scrollTo(0, scrollTo);
+        docElm = doc.documentElement;
+        docElm.innerHTML = msg.data;
+        // execute scripts in article
+        // re-attaching scripts is required for articles loaded dynamically
+        originalScripts = docElm.getElementsByTagName('script');
+        body = docElm.getElementsByTagName('body')[0];
+        if (!!body) {
+          for (i = 0, len = originalScripts.length; i < len; i++) {
+            script = doc.createElement('script');
+            src = originalScripts[i].getAttribute('src')
+            if(src) {
+              script.setAttribute('src', src);
+            } else {
+              script.textContent = originalScripts[i].textContent;
+            }
+            body.appendChild(script);
+          }
+        }
+        // refrect articles title to document
+        setTimeout(function(){
+          document.title = doc.title;
+        }, 100);
         break;
       case 'scroll':
         point = msg.data.split(' ')
