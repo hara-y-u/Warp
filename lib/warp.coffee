@@ -83,7 +83,7 @@ var soc = new WebSocket('ws://' + location.host + '/', 'warp')
 
 startupStack.push(function() {
   var scrollTo, point, inTop, inOffset, screen, docHeight
-  , top, screenDelta, scrollTo
+  , top, screenDelta, scrollTo, docElm, elm, body, src, script
   ;
 
   doc = frame.contentDocument;
@@ -103,17 +103,17 @@ startupStack.push(function() {
       case 'html':
         // // Remember Scroll Position
         // scrollTo = doc.documentElement.scrollTop || doc.body.scrollTop;
-        var docElm = doc.documentElement;
+        docElm = doc.documentElement;
         docElm.innerHTML = msg.data;
-        var elm = docElm.getElementsByTagName('script');
-        var body = docElm.getElementsByTagName('body');
-        var src=[];
+        elm = docElm.getElementsByTagName('script');
+        body = docElm.getElementsByTagName('body');
+        src=[];
         for (var i = 0; i < elm.length; i++) {
             src[i] = elm[i].getAttribute('src');
             //elm[i].parentNode.removeChild(elm[i]);
         }
         for (var i = 0; i < src.length; i++) {
-          var script = doc.createElement('script');
+          script = doc.createElement('script');
           script.setAttribute('src', src[i]);
           body[0].appendChild(script);
         }
