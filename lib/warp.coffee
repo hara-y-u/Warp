@@ -108,9 +108,9 @@ startupStack.push(function() {
         var elm = docElm.getElementsByTagName('script');
         var body = docElm.getElementsByTagName('body');
         var src=[];
-          for (var i = 0; i < elm.length; i++) {
+        for (var i = 0; i < elm.length; i++) {
             src[i] = elm[i].getAttribute('src');
-          //elm[i].parentNode.removeChild(elm[i]);
+            //elm[i].parentNode.removeChild(elm[i]);
         }
         for (var i = 0; i < src.length; i++) {
           var script = doc.createElement('script');
