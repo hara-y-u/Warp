@@ -3,7 +3,7 @@
 
 # Warp
 
-Warp provides Emacs with ability of realtime preview of html documents and documents which can be converted to htmls.
+Warp provides Emacs with ability of realtime preview of html documents and documents which can be converted to htmls. Preview opens in web browser.
 
 
 ## Features
