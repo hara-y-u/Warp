@@ -16,7 +16,7 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'warp-util)
 (require 'warp-ws-server)
 (require 'elnode)
@@ -25,7 +25,7 @@
 
 ;;; Main Struct
 
-(defstruct (warp-web-server
+(cl-defstruct (warp-web-server
             (:constructor nil)
             (:constructor warp-web-server--inner-make))
   (root-directory "~/public_html")
@@ -33,7 +33,19 @@
   (host "localhost")
   ; only for inner use
   warp-ws-server
+  static-handler
+  (asset-directory
+   (expand-file-name
+    "warp-client"
+    (file-name-directory (or load-file-name "."))))
+  (asset-files
+   '("index.html" "client.js" "client.css" "content.html"))
+  asset-handler
   )
+
+; Buffer dedicated warp-web-server
+(defvar warp-web-server nil)
+(make-variable-buffer-local 'warp-web-server)
 
 
 ;;; Constructor
@@ -84,39 +96,28 @@ Returns warp-web-server if succeeded, else returns nil.
 
 ;;; Methods (double hyphen means private)
 
-(defvar warp-web-server--static-handler nil)
-(make-variable-buffer-local 'warp-web-server--static-handler)
-
-(defvar warp-web-server--assets-directory
-  (expand-file-name
-   "warp-client"
-   (file-name-directory (or load-file-name "."))))
-
-(defvar warp-web-server--assets
-  ;; TODO: concat assets into index.html
-  '("index.html" "client.js" "client.css" "content.html"))
-
-(defvar warp-web-server--assets-handler nil)
-
 (defun warp-web-server--start-server-proc (web-server)
   "Start web server process for web-server and return its process"
-  (fset 'warp-web-server--static-handler
-        (elnode-webserver-handler-maker
-         (warp-web-server-root-directory web-server)))
-  (fset 'warp-web-server--assets-handler
-        (elnode-webserver-handler-maker warp-web-server--assets-directory))
-  (cdar (elnode-start
-         'warp-web-server--handler
-         :port (warp-web-server-port web-server)
-         :host (warp-web-server-host web-server))))
+  (let ((static-handler (warp-web-server-static-handler web-server))
+        (root-directory (warp-web-server-root-directory web-server))
+        (asset-handler (warp-web-server-asset-handler web-server))
+        (asset-directory (warp-web-server-asset-directory web-server)))
+    (fset static-handler
+          (elnode-webserver-handler-maker root-directory))
+    (fset asset-handler
+          (elnode-webserver-handler-maker asset-directory))
+    (cdar (elnode-start
+           'warp-web-server--handler
+           :port (warp-web-server-port web-server)
+           :host (warp-web-server-host web-server)))))
 
 (defun warp-web-server--handler (httpcon)
   (let* ((path (elnode-http-pathinfo httpcon))
          (fragment (substring path 1)))
     (when (equal path "/") (setq fragment "index.html"))
     (if (member fragment warp-web-server--assets)
-        (funcall 'warp-web-server--assets-handler httpcon)
-      (funcall 'warp-web-server--static-handler httpcon))))
+        (funcall (warp-web-server-asset-handler web-server) httpcon)
+      (funcall (warp-web-server-static-handler web-server) httpcon))))
 
 (defun warp-web-server--stop-server-proc (web-server)
   "Stop web server proc for web-server.
@@ -130,6 +131,8 @@ This function returns process object if succeed, else return nil"
 ;; TODO: If client gets large spec, cut this out to warp-client object.
 (defun warp-web-server-open-client (web-server)
   (browse-url (warp-web-server-client-url web-server)))
+
+
 (provide 'warp-web-server)
 
 ;;; warp-web-server.el ends here
