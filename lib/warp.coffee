@@ -201,7 +201,7 @@ soc.onclose = function() {
   startHttpServer: () =>
     @httpServer = http.createServer @handleHttpRequest
     @httpServer.listen @port
-    console.log "start:lotalhost:#{@port}"
+    console.log "start:localhost:#{@port}"
 
   handleHttpRequest: (req, res) =>
     switch url.parse(req.url).path
@@ -225,16 +225,29 @@ soc.onclose = function() {
         @sendStaticFiles req, res
 
   sendStaticFiles: (req, res) =>
-    p = path.join process.cwd(), decodeURI url.parse(req.url).path
+    # First, try treating req.url as an absolute path
+    p = decodeURI url.parse(req.url).path
     ext = path.extname p
-
-    _exists = fs.exists or path.exists
-
-    _exists p, (exists) =>
-      unless exists
+    fs.lstat p, (statserr, stats) =>
+      sendNotFound = ->
         res.writeHead 404, 'Content-Type': 'text/plain'
         res.write '404 Not Found\n'
         res.end()
+
+      # Something went wrong in accessing the file
+      if statserr
+        try 
+          # let's try again, treating req.url as a relative path
+          p = path.join process.cwd(), decodeURI url.parse(req.url).path
+          stats = fs.lstatSync(p)
+        catch _      
+          # We've exhausted our options, so we'll send a 404
+          sendNotFound()
+          return
+
+      # Ensure we're actually dealing with a file
+      unless stats.isFile()
+        sendNotFound()
         return
 
       # Suppress Chattering Display
@@ -267,6 +280,7 @@ soc.onclose = function() {
 
         res.write file, 'binary'
         res.end()
+
 
   # WebSocket
   startWebSocketServer: () =>
