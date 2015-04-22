@@ -18,6 +18,9 @@
 
 ;; TODO: Test will affect another unit test
 
+(add-to-list 'load-path default-directory)
+(load (expand-file-name "warp-web-server.el" default-directory))
+
 (eval-when-compile (require 'cl))
 (require 'ert)
 (require 'warp-web-server)

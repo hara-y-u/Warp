@@ -4,8 +4,9 @@
 
 ;; Author: yukihiro hara <yukihr@gmail.com>
 ;; URL: http://github.com/yukihr/Warp
-;; Keywords: Edit, Web
 ;; Version: 0.0.2
+;; Keywords: edit, web, hypermedia
+;; Package-Requires: ((emacs "24") (cl-lib "0.5") (elnode "0.9") (websocket "1.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

@@ -1,4 +1,4 @@
-;;; warp-web-server.el --- warp server for client html
+;;; warp-web-server.el --- warp server for web resources
 
 ;; Copyright (c) 2013  Free Software Foundation, Inc.
 

@@ -20,12 +20,21 @@
 (require 'websocket)
 ;(require 'warp-converter)
 
-(defstruct warp-ws-server
-  port
+(defstruct (warp-ws-server
+            (:constructor nil)
+            (:constructor warp-ws-server--inner-make))
+  (port 8850)
   websocket-server
-  client-server ; necessary?
+  warp-web-server
   (sockets nil)
   )
+
+(defun make-warp-ws-server (&rest options)
+  (let* ((ws-server
+          (apply 'warp-ws-server--inner-make options)))
+    )
+  )
+
 
 (provide 'warp-ws-server)
 
